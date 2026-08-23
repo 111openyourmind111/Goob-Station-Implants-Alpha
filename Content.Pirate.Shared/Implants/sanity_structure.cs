@@ -11,13 +11,15 @@ public enum SanityState : byte
     Cyberpsychosis = 3,
 }
 
-[RegisterComponent]
+[RegisterComponent, AutoGenerateComponentState]
 public sealed partial class CyberpsychosisComponent : Component
 {
     [DataField("sanityValue")]
-    public float SanityValue { get; set; } = 100f;
+    [AutoNetworkedField]
+    public int SanityValue { get; set; } = 100;
 
     [DataField("sanityState")]
+    [AutoNetworkedField]
     public SanityState CurrentState { get; set; } = SanityState.Normal;
 
     [DataField("decreaseSanity")]
@@ -38,27 +40,17 @@ public sealed partial class CyberpsychosisComponent : Component
     [DataField("drugRecoveryBonus")]
     public float DrugRecoveryBonus { get; set; } = 10f;
 
+    public bool IsCyberpsychotic =>
+        CurrentState == SanityState.Cyberpsychosis;
+
+    [DataField("activeImplantCount")]
+    public int ActiveImplantCount { get; set; }
+
+    public float UncontrolledActionTimer { get; set; }
+
     [DataField("uncontrolledActionCheckInterval")]
     public float UncontrolledActionCheckInterval { get; set; } = 1f;
 
     [DataField("uncontrolledActionChance")]
     public float UncontrolledActionChance { get; set; } = 5f;
-
-    // state
-    public int ActiveImplantCount { get; set; }
-
-    public float UncontrolledActionTimer { get; set; }
-
-    public bool IsCyberpsychotic =>
-        CurrentState == SanityState.Cyberpsychosis;
-}
-
-[Serializable, NetSerializable]
-public sealed class CyberpsychosisStateMessage : ComponentMessage
-{
-    public float SanityValue { get; set; }
-
-    public SanityState CurrentState { get; set; }
-
-    public bool IsCyberpsychotic { get; set; }
 }
