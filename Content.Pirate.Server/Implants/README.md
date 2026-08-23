@@ -1,13 +1,6 @@
-// Прототипи імплантів для Pirate контрибюшенів
-// 
-// Структура:
-// Content.Pirate.Server/Implants/
-// ├─ Cyberpsychosis/          - імпланти з впливом на психіку
-// │  ├─ PirateCyberwareSystem.cs
-// │  └─ (конкретні імпланти)
-// ├─ Combat/                  - бойові імпланти
-// ├─ Medical/                 - лікувальні імпланти
-// └─ Utility/                 - утиліти імпланти
-//
-// Кожний імплант наслідує від ImplantSanityComponent
-// та мається свою систему у відповідній папці
+TODO list of all implants and mechanics:
+
+///CHPTR 1
+//Sanity mechanic
+//Put over structure an UI for client
+//Make other in-game implants workable so they'll decrease sanity of user's character
