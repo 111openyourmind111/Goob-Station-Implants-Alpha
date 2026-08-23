@@ -9,7 +9,7 @@ public enum SanityState : byte
     LessNormal = 1,
     CloseCyberpsychosis = 2,
     Cyberpsychosis = 3,
-
+}
 [RegisterComponent]
 public sealed partial class CyberpsychosisComponent : Component
 {
