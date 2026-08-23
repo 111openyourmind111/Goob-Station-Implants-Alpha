@@ -1,4 +1,5 @@
 using Robust.Shared.GameObjects;
+using Robust.Shared.GameStates;
 using Robust.Shared.Serialization;
 
 namespace Content.Pirate.Shared.Implants.Cyberpsychosis;
@@ -11,7 +12,7 @@ public enum SanityState : byte
     Cyberpsychosis = 3,
 }
 
-[RegisterComponent, AutoGenerateComponentState]
+[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
 public sealed partial class CyberpsychosisComponent : Component
 {
     [DataField("sanityValue")]
