@@ -1,0 +1,39 @@
+{
+  "version": 1,
+  "license": "CC-BY-SA-3.0",
+  "copyright": "Pirate Station Implants Contributors",
+  "size": {
+    "x": 64,
+    "y": 8
+  },
+  "states": [
+    {
+      "name": "sanity_bar_empty",
+      "directions": 1,
+      "delays": [
+        [0.1]
+      ]
+    },
+    {
+      "name": "sanity_bar_low",
+      "directions": 1,
+      "delays": [
+        [0.1]
+      ]
+    },
+    {
+      "name": "sanity_bar_medium",
+      "directions": 1,
+      "delays": [
+        [0.1]
+      ]
+    },
+    {
+      "name": "sanity_bar_full",
+      "directions": 1,
+      "delays": [
+        [0.1]
+      ]
+    }
+  ]
+}
