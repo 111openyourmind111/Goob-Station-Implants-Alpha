@@ -1,0 +1,14 @@
+- type: alert
+  id: CyberpsychosisSanity
+  icons:
+  - sprite: _Pirate/Implants/Cyberpsychosis/sanity_bar.rsi
+    state: sanity_bar_full
+  - sprite: _Pirate/Implants/Cyberpsychosis/sanity_bar.rsi
+    state: sanity_bar_medium
+  - sprite: _Pirate/Implants/Cyberpsychosis/sanity_bar.rsi
+    state: sanity_bar_low
+  - sprite: _Pirate/Implants/Cyberpsychosis/sanity_bar.rsi
+    state: sanity_bar_empty
+  maxSeverity: 4
+  name: alerts-cyberpsychosis-name
+  description: alerts-cyberpsychosis-desc
