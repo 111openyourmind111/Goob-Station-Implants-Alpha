@@ -54,4 +54,7 @@ public sealed partial class CyberpsychosisComponent : Component
 
     [DataField("uncontrolledActionChance")]
     public float UncontrolledActionChance { get; set; } = 5f;
+
+    [DataField("baseSanity")]
+    public int BaseSanity { get; set; } = 100;
 }
