@@ -7,6 +7,7 @@ using Content.Shared.Alert;
 using Content.Shared.CombatMode;
 using Content.Shared.Damage;
 using Content.Shared.GameTicking;
+using Content.Shared.Ghost;
 using Content.Shared.Implants;
 using Content.Shared.Implants.Components;
 using Content.Shared.Mobs;
@@ -18,6 +19,7 @@ using Content.Shared.Rejuvenate;
 using Content.Shared.Weapons.Melee;
 using Robust.Shared.GameObjects;
 using Robust.Shared.Prototypes;
+using Robust.Shared.Player;
 
 namespace Content.Pirate.Server.Implants;
 
@@ -29,6 +31,7 @@ public sealed class CyberpsychosisSystem : EntitySystem
     [Dependency] private readonly NpcFactionSystem _faction = default!;
     [Dependency] private readonly MindSystem _mind = default!;
     [Dependency] private readonly SharedCombatModeSystem _combat = default!;
+    [Dependency] private readonly SharedGhostSystem _ghosts = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
 
     private static readonly ProtoId<NpcFactionPrototype> HostileFaction = "SimpleHostile";
@@ -83,7 +86,7 @@ public sealed class CyberpsychosisSystem : EntitySystem
 
     private void OnMobStateChanged(Entity<CyberpsychosisComponent> ent, ref MobStateChangedEvent args)
     {
-
+ 
         if (args.NewMobState != MobState.Dead || ent.Comp.SanityValue > 0)
             return;
 
@@ -123,8 +126,20 @@ public sealed class CyberpsychosisSystem : EntitySystem
 
         if (component.SanityValue <= 0 && !_mobState.IsDead(uid))
         {
+            // Capture the player before the death handler detaches them onto their ghost.
+            ICommonSession? session = null;
+            if (TryComp<ActorComponent>(uid, out var actor))
+                session = actor.PlayerSession;
+
             Log.Info($"[CYBERPSYCHOSIS] {ToPrettyString(uid)} sanity reached 0, dying.");
             _mobState.ChangeMobState(uid, MobState.Dead);
+
+
+            if (session?.AttachedEntity is { Valid: true } ghost
+                && TryComp<GhostComponent>(ghost, out var ghostComp))
+            {
+                _ghosts.SetCanReturnToBody(ghost, false, ghostComp);
+            }
         }
     }
 
@@ -157,10 +172,8 @@ public sealed class CyberpsychosisSystem : EntitySystem
         var combat = EnsureComp<CombatModeComponent>(mob);
         _combat.SetCanDisarm(mob, false, combat);
 
-
         _faction.ClearFactions(mob, dirty: false);
         _faction.AddFaction(mob, HostileFaction);
-
 
         var htn = EnsureComp<HTNComponent>(mob);
         htn.RootTask = new HTNCompoundTask { Task = "SimpleHostileCompound" };
