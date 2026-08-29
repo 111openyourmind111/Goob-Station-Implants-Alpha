@@ -1,15 +1,37 @@
 using Content.Pirate.Shared.Implants.Cyberpsychosis;
+using Content.Server.Mind;
+using Content.Server.NPC;
+using Content.Server.NPC.HTN;
+using Content.Server.NPC.Systems;
 using Content.Shared.Alert;
+using Content.Shared.CombatMode;
+using Content.Shared.Damage;
 using Content.Shared.GameTicking;
 using Content.Shared.Implants;
 using Content.Shared.Implants.Components;
+using Content.Shared.Mobs;
+using Content.Shared.Mobs.Systems;
+using Content.Shared.NPC.Prototypes;
+using Content.Shared.NPC.Systems;
+using Content.Shared.Popups;
+using Content.Shared.Rejuvenate;
+using Content.Shared.Weapons.Melee;
 using Robust.Shared.GameObjects;
+using Robust.Shared.Prototypes;
 
 namespace Content.Pirate.Server.Implants;
 
 public sealed class CyberpsychosisSystem : EntitySystem
 {
     [Dependency] private readonly AlertsSystem _alerts = default!;
+    [Dependency] private readonly MobStateSystem _mobState = default!;
+    [Dependency] private readonly NPCSystem _npc = default!;
+    [Dependency] private readonly NpcFactionSystem _faction = default!;
+    [Dependency] private readonly MindSystem _mind = default!;
+    [Dependency] private readonly SharedCombatModeSystem _combat = default!;
+    [Dependency] private readonly SharedPopupSystem _popup = default!;
+
+    private static readonly ProtoId<NpcFactionPrototype> HostileFaction = "SimpleHostile";
 
     public override void Initialize()
     {
@@ -20,6 +42,7 @@ public sealed class CyberpsychosisSystem : EntitySystem
         SubscribeLocalEvent<CyberpsychosisLoadComponent, ImplantImplantedEvent>(OnImplantAdded);
         SubscribeLocalEvent<CyberpsychosisLoadComponent, ImplantRemovedEvent>(OnImplantRemoved);
         SubscribeLocalEvent<CyberpsychosisComponent, ComponentShutdown>(OnShutdown);
+        SubscribeLocalEvent<CyberpsychosisComponent, MobStateChangedEvent>(OnMobStateChanged);
     }
 
     private void OnPlayerSpawnComplete(PlayerSpawnCompleteEvent args)
@@ -58,6 +81,15 @@ public sealed class CyberpsychosisSystem : EntitySystem
         _alerts.ClearAlert(uid, "CyberpsychosisSanity");
     }
 
+    private void OnMobStateChanged(Entity<CyberpsychosisComponent> ent, ref MobStateChangedEvent args)
+    {
+
+        if (args.NewMobState != MobState.Dead || ent.Comp.SanityValue > 0)
+            return;
+
+        TakeOverAsHostile(ent);
+    }
+
     public void RecalculateSanity(EntityUid mob, CyberpsychosisComponent component)
     {
         var totalLoad = 0f;
@@ -88,6 +120,58 @@ public sealed class CyberpsychosisSystem : EntitySystem
         Dirty(uid, component);
 
         _alerts.ShowAlert(uid, "CyberpsychosisSanity", (short) severity);
+
+        if (component.SanityValue <= 0 && !_mobState.IsDead(uid))
+        {
+            Log.Info($"[CYBERPSYCHOSIS] {ToPrettyString(uid)} sanity reached 0, dying.");
+            _mobState.ChangeMobState(uid, MobState.Dead);
+        }
+    }
+
+
+    public void TakeOverAsHostile(EntityUid mob)
+    {
+        if (HasComp<HTNComponent>(mob))
+            return;
+
+        Log.Info($"[CYBERPSYCHOSIS] {ToPrettyString(mob)} snapped. AI takes control.");
+
+
+        RaiseLocalEvent(mob, new RejuvenateEvent(false, false));
+        _mobState.ChangeMobState(mob, MobState.Alive);
+
+
+        var melee = EnsureComp<MeleeWeaponComponent>(mob);
+        melee.Damage = new DamageSpecifier
+        {
+            DamageDict = new()
+            {
+                { "Blunt", 12 },
+                { "Piercing", 4 },
+                { "Structural", 8 }
+            }
+        };
+        melee.Range = 1.5f;
+        Dirty(mob, melee);
+
+        var combat = EnsureComp<CombatModeComponent>(mob);
+        _combat.SetCanDisarm(mob, false, combat);
+
+
+        _faction.ClearFactions(mob, dirty: false);
+        _faction.AddFaction(mob, HostileFaction);
+
+
+        var htn = EnsureComp<HTNComponent>(mob);
+        htn.RootTask = new HTNCompoundTask { Task = "SimpleHostileCompound" };
+        htn.Blackboard.SetValue(NPCBlackboard.Owner, mob);
+        _npc.SleepNPC(mob, htn);
+
+        _mind.MakeSentient(mob);
+
+        _npc.WakeNPC(mob, htn);
+
+        _popup.PopupEntity(Loc.GetString("cyberpsychosis-takeover", ("target", mob)), mob, PopupType.LargeCaution);
     }
 
     private static int SeverityFromSanity(CyberpsychosisComponent c)
