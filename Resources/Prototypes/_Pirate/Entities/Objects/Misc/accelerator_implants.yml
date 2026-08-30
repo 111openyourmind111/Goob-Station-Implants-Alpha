@@ -1,0 +1,38 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+# The raw implant lives hidden here because the fixture the player actually
+# interacts with is the preloaded implanter below.
+
+- type: entity
+  parent: BaseSubdermalImplant
+  id: AcceleratorImplant
+  name: accelerator implant
+  description: A dense lattice of stimulant nano-circuits. Every action becomes faster, but it burns through your biological energy at a terrifying rate.
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Sprite
+    sprite: _Pirate/Implants/Accelerator/accelerator.rsi
+    state: accelerator
+  - type: Icon
+    sprite: _Pirate/Implants/Accelerator/accelerator.rsi
+    state: accelerator
+  - type: CyberpsychosisLoad
+    sanityCost: 14
+  - type: ComponentsImplant
+    added:
+    - type: Accelerator
+      speedMultiplier: 3
+      hungerRateMultiplier: 4
+      starvationGraceDuration: 40
+      starvationDamageInterval: 2
+    - type: BonusMeleeAttackRate
+      multiplier: 1.5
+
+- type: entity
+  parent: BaseImplantOnlyImplanter
+  id: AcceleratorImplanter
+  name: accelerator implanter
+  description: A disposable syringe loaded with an accelerator implant. Injecting it into a person installs a lattice of stimulant nano-circuits under their skin.
+  components:
+  - type: Implanter
+    implant: AcceleratorImplant
