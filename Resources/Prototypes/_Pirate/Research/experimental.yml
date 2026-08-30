@@ -1,0 +1,17 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+- type: technology
+  id: AcceleratorImplants
+  name: research-technology-accelerator-implants
+  description: research-technology-accelerator-implants-desc
+  icon:
+    sprite: _Pirate/Implants/Accelerator/accelerator.rsi
+    state: accelerator
+  discipline: Experimental
+  tier: 3
+  cost: 15000
+  recipeUnlocks:
+  - AcceleratorImplanter
+  technologyPrerequisites:
+  - ExperimentalScience
+  position: -5,4
