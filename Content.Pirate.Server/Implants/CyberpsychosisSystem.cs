@@ -65,10 +65,12 @@ public sealed class CyberpsychosisSystem : EntitySystem
 
     private void OnImplantAdded(Entity<CyberpsychosisLoadComponent> ent, ref ImplantImplantedEvent args)
     {
-        if (!TryComp<CyberpsychosisComponent>(args.Implanted, out var cyber))
-            return;
-
+        var cyber = EnsureComp<CyberpsychosisComponent>(args.Implanted);
         RecalculateSanity(args.Implanted, cyber);
+
+        _popup.PopupEntity(
+            Loc.GetString("cyberpsychosis-implant-info", ("value", cyber.SanityValue)),
+            args.Implanted, PopupType.Medium);
     }
 
     private void OnImplantRemoved(Entity<CyberpsychosisLoadComponent> ent, ref ImplantRemovedEvent args)
@@ -77,6 +79,10 @@ public sealed class CyberpsychosisSystem : EntitySystem
             return;
 
         RecalculateSanity(args.Implanted, cyber);
+
+        _popup.PopupEntity(
+            Loc.GetString("cyberpsychosis-implant-info", ("value", cyber.SanityValue)),
+            args.Implanted, PopupType.Medium);
     }
 
     private void OnShutdown(EntityUid uid, CyberpsychosisComponent component, ComponentShutdown args)
@@ -86,7 +92,7 @@ public sealed class CyberpsychosisSystem : EntitySystem
 
     private void OnMobStateChanged(Entity<CyberpsychosisComponent> ent, ref MobStateChangedEvent args)
     {
- 
+        // Only snap when the character hits 0 sanity and actually dies.
         if (args.NewMobState != MobState.Dead || ent.Comp.SanityValue > 0)
             return;
 
@@ -134,7 +140,8 @@ public sealed class CyberpsychosisSystem : EntitySystem
             Log.Info($"[CYBERPSYCHOSIS] {ToPrettyString(uid)} sanity reached 0, dying.");
             _mobState.ChangeMobState(uid, MobState.Dead);
 
-
+            // The player exits the character permanently and can't return to it:
+            // their ghost is stripped of the ability to re-enter this body.
             if (session?.AttachedEntity is { Valid: true } ghost
                 && TryComp<GhostComponent>(ghost, out var ghostComp))
             {
@@ -143,7 +150,10 @@ public sealed class CyberpsychosisSystem : EntitySystem
         }
     }
 
-
+    /// <summary>
+    /// The player already died and got ghosted. Revive the husk as an AI-controlled
+    /// hostile that melee attacks everyone.
+    /// </summary>
     public void TakeOverAsHostile(EntityUid mob)
     {
         if (HasComp<HTNComponent>(mob))
@@ -151,11 +161,11 @@ public sealed class CyberpsychosisSystem : EntitySystem
 
         Log.Info($"[CYBERPSYCHOSIS] {ToPrettyString(mob)} snapped. AI takes control.");
 
-
+        // Fully heal and revive the body (the player's mind is already on a ghost).
         RaiseLocalEvent(mob, new RejuvenateEvent(false, false));
         _mobState.ChangeMobState(mob, MobState.Alive);
 
-
+        // Give it a melee attack.
         var melee = EnsureComp<MeleeWeaponComponent>(mob);
         melee.Damage = new DamageSpecifier
         {
@@ -172,9 +182,11 @@ public sealed class CyberpsychosisSystem : EntitySystem
         var combat = EnsureComp<CombatModeComponent>(mob);
         _combat.SetCanDisarm(mob, false, combat);
 
+        // Enemy of everyone.
         _faction.ClearFactions(mob, dirty: false);
         _faction.AddFaction(mob, HostileFaction);
 
+        // Hostile melee brain.
         var htn = EnsureComp<HTNComponent>(mob);
         htn.RootTask = new HTNCompoundTask { Task = "SimpleHostileCompound" };
         htn.Blackboard.SetValue(NPCBlackboard.Owner, mob);

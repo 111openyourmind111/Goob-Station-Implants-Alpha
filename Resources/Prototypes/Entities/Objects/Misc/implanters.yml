@@ -52,6 +52,7 @@
     # Goob implants
     - MindcontrolImplant
     - KravMagaImplant
+    - AcceleratorImplant
     - NutrimentPumpImplant
     - SmokeImplant
     # - StypticStimulatorImplant # Uncomment if given to traitors, currently it's DS only implant
