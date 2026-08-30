@@ -6,9 +6,9 @@
   result: AcceleratorImplanter
   completetime: 4
   materials:
-    Steel: 500
-    Glass: 500
+    Steel: 800
+    Glass: 700
     Plastic: 200
-    Gold: 200
-    Silver: 200
+    Gold: 400
+    Silver: 300
     Plasma: 100

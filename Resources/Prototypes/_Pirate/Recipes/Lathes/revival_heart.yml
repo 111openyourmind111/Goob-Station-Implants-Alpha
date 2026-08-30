@@ -1,0 +1,13 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+- type: latheRecipe
+  id: RevivalHeart
+  name: lathe-recipe-revival-heart-name
+  result: RevivalHeart
+  completetime: 6
+  materials:
+    Steel: 2000
+    Glass: 1000
+    Plastic: 500
+    Gold: 800
+    Silver: 800

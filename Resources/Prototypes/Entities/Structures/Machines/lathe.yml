@@ -656,6 +656,7 @@
     - BasicCybernetics
     - AdvancedCybernetics
     - CyberpsychosisImplants
+    - PirateCyberOrgans
     # Pirate end - add cybernetic limbs and organs to medfab
   - type: Machine
     board: MedicalTechFabCircuitboard

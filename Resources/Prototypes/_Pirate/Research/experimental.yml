@@ -9,9 +9,27 @@
     state: accelerator
   discipline: Experimental
   tier: 3
-  cost: 15000
+  cost: 29500
   recipeUnlocks:
   - AcceleratorImplanter
   technologyPrerequisites:
+  - AdvancedCybernetics
   - ExperimentalScience
   position: -5,4
+
+- type: technology
+  id: RevivalHeartImplants
+  name: research-technology-revival-heart-implants
+  description: research-technology-revival-heart-implants-desc
+  icon:
+    sprite: _Pirate/Body/Organs/revival_heart.rsi
+    state: heart-on
+  discipline: Experimental
+  tier: 3
+  cost: 27500
+  recipeUnlocks:
+  - RevivalHeart
+  technologyPrerequisites:
+  - ExperimentalScience
+  - AdvancedCybernetics
+  position: -6,4

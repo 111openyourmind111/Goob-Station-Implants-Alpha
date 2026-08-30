@@ -1,0 +1,28 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+- type: entity
+  parent: BaseCyberneticOrgan
+  id: RevivalHeart
+  name: revival heart
+  description: An experimental cybernetic heart that resurrects its host exactly once, back to full health. The charge is consumed with each resurrection.
+  components:
+  - type: Sprite
+    sprite: _Shitmed/Mobs/Species/Misc/Cybernetics/organs.rsi
+    state: heart-u-on
+  - type: Heart
+  - type: Organ
+    intCap: 130
+    integrity: 130
+    integrityThresholds:
+      Normal: 130
+      Damaged: 45
+      Destroyed: 0
+    slotId: heart
+  - type: RevivalHeart
+  - type: Tag
+    tags:
+    - Organ
+    - Heart
+  - type: Item
+    size: Small
+    heldPrefix: heart
