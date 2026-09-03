@@ -7,7 +7,7 @@
   icon:
     sprite: _Pirate/Implants/Accelerator/accelerator.rsi
     state: accelerator
-  discipline: Experimental
+  discipline: Arsenal
   tier: 3
   cost: 29500
   recipeUnlocks:
@@ -15,7 +15,9 @@
   technologyPrerequisites:
   - AdvancedCybernetics
   - ExperimentalScience
-  position: -5,4
+  - AdvancedPowerGeneration
+  - BluespaceChemistry
+  position: 6,6
 
 - type: technology
   id: RevivalHeartImplants
@@ -24,7 +26,7 @@
   icon:
     sprite: _Pirate/Body/Organs/revival_heart.rsi
     state: heart-on
-  discipline: Experimental
+  discipline: Arsenal
   tier: 3
   cost: 27500
   recipeUnlocks:
@@ -32,4 +34,5 @@
   technologyPrerequisites:
   - ExperimentalScience
   - AdvancedCybernetics
-  position: -6,4
+  - AdvancedPowerGeneration
+  position: 6,4

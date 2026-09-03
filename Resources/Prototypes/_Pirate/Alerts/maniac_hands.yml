@@ -1,0 +1,14 @@
+- type: alert
+  id: ManiacHandsKills
+  icons:
+  - sprite: _Pirate/Implants/ManiacHands/maniac_hands.rsi
+    state: maniac_0
+  - sprite: _Pirate/Implants/ManiacHands/maniac_hands.rsi
+    state: maniac_3
+  - sprite: _Pirate/Implants/ManiacHands/maniac_hands.rsi
+    state: maniac_5
+  - sprite: _Pirate/Implants/ManiacHands/maniac_hands.rsi
+    state: maniac_8
+  maxSeverity: 4
+  name: alerts-maniac-hands-name
+  description: alerts-maniac-hands-desc

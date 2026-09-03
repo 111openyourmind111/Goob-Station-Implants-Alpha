@@ -7,8 +7,8 @@
   description: An experimental cybernetic heart that resurrects its host exactly once, back to full health. The charge is consumed with each resurrection.
   components:
   - type: Sprite
-    sprite: _Shitmed/Mobs/Species/Misc/Cybernetics/organs.rsi
-    state: heart-u-on
+    sprite: _Pirate/Body/Organs/revival_heart.rsi
+    state: heart-item
   - type: Heart
   - type: Organ
     intCap: 130

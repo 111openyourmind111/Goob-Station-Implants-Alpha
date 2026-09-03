@@ -1,9 +1,14 @@
 using Content.Pirate.Shared.Implants.Cyberpsychosis;
+using Content.Pirate.Shared.Implants.ManiacHands;
 using Content.Server.Mind;
 using Content.Server.NPC;
 using Content.Server.NPC.HTN;
 using Content.Server.NPC.Systems;
 using Content.Shared.Alert;
+using Content.Shared.Body.Components;
+using Content.Shared.Body.Events;
+using Content.Shared.Body.Organ;
+using Content.Shared.Body.Systems;
 using Content.Shared.CombatMode;
 using Content.Shared.Damage;
 using Content.Shared.GameTicking;
@@ -26,6 +31,7 @@ namespace Content.Pirate.Server.Implants;
 public sealed class CyberpsychosisSystem : EntitySystem
 {
     [Dependency] private readonly AlertsSystem _alerts = default!;
+    [Dependency] private readonly SharedBodySystem _body = default!;
     [Dependency] private readonly MobStateSystem _mobState = default!;
     [Dependency] private readonly NPCSystem _npc = default!;
     [Dependency] private readonly NpcFactionSystem _faction = default!;
@@ -44,6 +50,8 @@ public sealed class CyberpsychosisSystem : EntitySystem
         SubscribeLocalEvent<CyberpsychosisComponent, ComponentStartup>(OnStartup);
         SubscribeLocalEvent<CyberpsychosisLoadComponent, ImplantImplantedEvent>(OnImplantAdded);
         SubscribeLocalEvent<CyberpsychosisLoadComponent, ImplantRemovedEvent>(OnImplantRemoved);
+        SubscribeLocalEvent<CyberpsychosisLoadComponent, OrganAddedEvent>(OnOrganLoadAdded);
+        SubscribeLocalEvent<CyberpsychosisLoadComponent, OrganRemovedEvent>(OnOrganLoadRemoved);
         SubscribeLocalEvent<CyberpsychosisComponent, ComponentShutdown>(OnShutdown);
         SubscribeLocalEvent<CyberpsychosisComponent, MobStateChangedEvent>(OnMobStateChanged);
     }
@@ -85,6 +93,34 @@ public sealed class CyberpsychosisSystem : EntitySystem
             args.Implanted, PopupType.Medium);
     }
 
+    private void OnOrganLoadAdded(Entity<CyberpsychosisLoadComponent> ent, ref OrganAddedEvent args)
+    {
+        if (args.Body is not { Valid: true } body)
+            return;
+
+        var cyber = EnsureComp<CyberpsychosisComponent>(body);
+        RecalculateSanity(body, cyber);
+
+        _popup.PopupEntity(
+            Loc.GetString("cyberpsychosis-implant-info", ("value", cyber.SanityValue)),
+            body, PopupType.Medium);
+    }
+
+    private void OnOrganLoadRemoved(Entity<CyberpsychosisLoadComponent> ent, ref OrganRemovedEvent args)
+    {
+        if (args.OldBody is not { Valid: true } body)
+            return;
+
+        if (!TryComp<CyberpsychosisComponent>(body, out var cyber))
+            return;
+
+        RecalculateSanity(body, cyber);
+
+        _popup.PopupEntity(
+            Loc.GetString("cyberpsychosis-implant-info", ("value", cyber.SanityValue)),
+            body, PopupType.Medium);
+    }
+
     private void OnShutdown(EntityUid uid, CyberpsychosisComponent component, ComponentShutdown args)
     {
         _alerts.ClearAlert(uid, "CyberpsychosisSanity");
@@ -116,8 +152,28 @@ public sealed class CyberpsychosisSystem : EntitySystem
             }
         }
 
+        // Cybernetic organ augments (e.g. Maniac Hands) also put strain on the mind.
+        if (TryComp<BodyComponent>(mob, out _)
+            && _body.TryGetBodyOrganEntityComps<CyberpsychosisLoadComponent>((mob, null), out var organs))
+        {
+            foreach (var organ in organs)
+            {
+                totalLoad += organ.Comp1.SanityCost;
+                count++;
+            }
+        }
+
+        var newLoad = totalLoad;
+        var oldLoad = component.ActiveImplantLoad;
+
+        // Apply only the NET change in cybernetic load to the current sanity, so
+        // installing/removing an implant never resets or heals already-lost sanity.
+        var delta = (int) MathF.Round(newLoad - oldLoad);
+        if (delta != 0)
+            component.SanityValue = Math.Clamp(component.SanityValue - delta, 0, component.BaseSanity);
+
         component.ActiveImplantCount = count;
-        component.SanityValue = Math.Clamp(component.BaseSanity - (int) MathF.Round(totalLoad), 0, component.BaseSanity);
+        component.ActiveImplantLoad = newLoad;
         RefreshAlert(mob, component);
     }
 
@@ -165,19 +221,31 @@ public sealed class CyberpsychosisSystem : EntitySystem
         RaiseLocalEvent(mob, new RejuvenateEvent(false, false));
         _mobState.ChangeMobState(mob, MobState.Alive);
 
-        // Give it a melee attack.
-        var melee = EnsureComp<MeleeWeaponComponent>(mob);
-        melee.Damage = new DamageSpecifier
+        // Check if the body has Maniac Hands arm installed.
+        bool hasManiacHands = false;
+        if (TryComp<BodyComponent>(mob, out _) &&
+            _body.TryGetBodyOrganEntityComps<ManiacHandsArmComponent>((mob, null), out var organs))
         {
-            DamageDict = new()
+            hasManiacHands = organs.Count > 0;
+        }
+
+        if (!hasManiacHands)
+        {
+            // Give it a generic melee attack.
+            var melee = EnsureComp<MeleeWeaponComponent>(mob);
+            melee.Damage = new DamageSpecifier
             {
-                { "Blunt", 12 },
-                { "Piercing", 4 },
-                { "Structural", 8 }
-            }
-        };
-        melee.Range = 1.5f;
-        Dirty(mob, melee);
+                DamageDict = new()
+                {
+                    { "Blunt", 12 },
+                    { "Piercing", 4 },
+                    { "Structural", 8 }
+                }
+            };
+            melee.Range = 1.5f;
+            Dirty(mob, melee);
+        }
+        // else: rely on ManiacHandsSystem to boost natural unarmed damage.
 
         var combat = EnsureComp<CombatModeComponent>(mob);
         _combat.SetCanDisarm(mob, false, combat);

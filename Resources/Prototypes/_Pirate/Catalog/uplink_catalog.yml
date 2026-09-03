@@ -267,3 +267,14 @@
     Telecrystal: 30
   categories:
   - UplinkWearables
+
+- type: listing
+  id: UplinkManiacHands
+  name: uplink-maniac-hands-name
+  description: uplink-maniac-hands-desc
+  icon: { sprite: _Goobstation/Actions/kravmaga.rsi, state: lungpunch }
+  productEntity: ManiacHandsArm
+  cost:
+    Telecrystal: 30
+  categories:
+  - UplinkImplants

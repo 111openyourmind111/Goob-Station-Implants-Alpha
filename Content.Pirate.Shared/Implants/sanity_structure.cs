@@ -47,6 +47,9 @@ public sealed partial class CyberpsychosisComponent : Component
     [DataField("activeImplantCount")]
     public int ActiveImplantCount { get; set; }
 
+    [DataField("activeImplantLoad")]
+    public float ActiveImplantLoad { get; set; }
+
     public float UncontrolledActionTimer { get; set; }
 
     [DataField("uncontrolledActionCheckInterval")]
