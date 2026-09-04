@@ -8,7 +8,7 @@ using Content.Server.Chat.Managers;
 using Content.Shared.Alert;
 using Content.Shared.Body.Components;
 using Content.Shared.Body.Events;
-using Content.Shared.Body.Organ;
+using Content.Shared.Body.Part;
 using Content.Shared.Body.Systems;
 using Content.Shared.Damage;
 using Content.Shared.Hands.EntitySystems;
@@ -22,9 +22,9 @@ using Robust.Shared.Player;
 namespace Content.Pirate.Server.Implants.ManiacHands;
 
 /// <summary>
-///     Server-side logic for the Maniac Hands cybernetic arm: while it is
-///     surgically installed, empty-handed strikes deal escalating damage per
-///     kill while gnawing at the host's sanity.
+///     Server-side logic for the Maniac Hands paired cybernetic hands.
+///     When both hands are installed, empty-handed strikes deal escalating
+///     damage per kill while gnawing at the host's sanity.
 /// </summary>
 public sealed class ManiacHandsSystem : EntitySystem
 {
@@ -40,10 +40,64 @@ public sealed class ManiacHandsSystem : EntitySystem
     {
         base.Initialize();
 
+        SubscribeLocalEvent<ManiacHandComponent, BodyPartAddedEvent>(OnHandAdded);
+        SubscribeLocalEvent<ManiacHandComponent, BodyPartRemovedEvent>(OnHandRemoved);
         SubscribeLocalEvent<ManiacHandsComponent, MeleeHitEvent>(OnMeleeHit);
         SubscribeLocalEvent<ManiacHandsComponent, AfterMeleeHitEvent>(OnAfterMeleeHit);
-        SubscribeLocalEvent<ManiacHandsArmComponent, OrganAddedEvent>(OnArmAdded);
-        SubscribeLocalEvent<ManiacHandsArmComponent, OrganRemovedEvent>(OnArmRemoved);
+    }
+
+    private void OnHandAdded(Entity<ManiacHandComponent> hand, ref BodyPartAddedEvent args)
+    {
+        var body = args.Part.Comp.Body;
+        if (body is not { Valid: true })
+            return;
+
+        // Link this hand to the host's ManiacHandsComponent.
+        var host = EnsureComp<ManiacHandsComponent>(body.Value);
+        if (hand.Comp.Side == HandSide.Left)
+            host.LeftHand = hand.Owner;
+        else
+            host.RightHand = hand.Owner;
+
+        Dirty(body.Value, host);
+
+        // If both hands are now present, activate the mechanic.
+        if (host.LeftHand is { Valid: true } && host.RightHand is { Valid: true })
+        {
+            _alerts.ShowAlert(body.Value, "ManiacHandsKills", (short)SeverityFromKills(host.Kills));
+            _popup.PopupEntity(Loc.GetString("maniac-hands-activated"), body.Value, PopupType.LargeCaution);
+        }
+    }
+
+    private void OnHandRemoved(Entity<ManiacHandComponent> hand, ref BodyPartRemovedEvent args)
+    {
+        var body = args.Part.Comp.Body;
+        if (body is not { Valid: true })
+            return;
+
+        if (!TryComp<ManiacHandsComponent>(body.Value, out var host))
+            return;
+
+        // Unlink the hand.
+        if (hand.Comp.Side == HandSide.Left && host.LeftHand == hand.Owner)
+            host.LeftHand = null;
+        else if (hand.Comp.Side == HandSide.Right && host.RightHand == hand.Owner)
+            host.RightHand = null;
+
+        // If we no longer have both hands, deactivate.
+        if (host.LeftHand is not { Valid: true } || host.RightHand is not { Valid: true })
+        {
+            _alerts.ClearAlert(body.Value, "ManiacHandsKills");
+
+            // If no hands left at all, drop the host component entirely.
+            if (host.LeftHand is not { Valid: true } && host.RightHand is not { Valid: true })
+            {
+                EntityManager.RemoveComponent<ManiacHandsComponent>(body.Value);
+                return;
+            }
+        }
+
+        Dirty(body.Value, host);
     }
 
     private void OnMeleeHit(Entity<ManiacHandsComponent> ent, ref MeleeHitEvent args)
@@ -51,27 +105,19 @@ public sealed class ManiacHandsSystem : EntitySystem
         if (args.Handled || !args.IsHit)
             return;
 
-        // Only natural strikes are boosted: when the melee "weapon" is the mob itself.
+        // Only boost natural, empty-handed punches.
         if (args.Weapon != args.User)
             return;
 
-        // Strictly require completely empty hands.
         if (_hands.EnumerateHeld(args.User).Any())
             return;
 
-        // Remember whether each target was already dead before the swing lands so
-        // the after-hit handler can attribute actual kills.
+        // Record pre-hit states for kill attribution.
         ent.Comp.HitTargets.Clear();
         foreach (var target in args.HitEntities)
             ent.Comp.HitTargets[target] = _mobState.IsDead(target);
 
-        if (ent.Comp.Arm is not { Valid: true } arm
-            || !TryComp<ManiacHandsArmComponent>(arm, out var armComp))
-        {
-            return;
-        }
-
-        var total = ent.Comp.BaseDamage + armComp.Kills * ent.Comp.DamagePerKill;
+        var total = ent.Comp.BaseDamage + ent.Comp.Kills * ent.Comp.DamagePerKill;
         var bonus = FixedPoint2.New(total) - args.BaseDamage.GetTotal();
         if (bonus > FixedPoint2.Zero)
             args.BonusDamage.DamageDict["Blunt"] = args.BonusDamage.DamageDict.GetValueOrDefault("Blunt") + bonus;
@@ -79,13 +125,6 @@ public sealed class ManiacHandsSystem : EntitySystem
 
     private void OnAfterMeleeHit(Entity<ManiacHandsComponent> ent, ref AfterMeleeHitEvent args)
     {
-        if (ent.Comp.Arm is not { Valid: true } arm
-            || !TryComp<ManiacHandsArmComponent>(arm, out var armComp))
-        {
-            ent.Comp.HitTargets.Clear();
-            return;
-        }
-
         if (args.IsHit && args.Weapon == args.User)
         {
             var kills = 0;
@@ -97,15 +136,15 @@ public sealed class ManiacHandsSystem : EntitySystem
 
             if (kills > 0)
             {
-                armComp.Kills += kills;
-                Dirty(arm, armComp);
+                ent.Comp.Kills += kills;
+                Dirty(ent.Owner, ent.Comp);
 
-                var damage = ent.Comp.BaseDamage + armComp.Kills * ent.Comp.DamagePerKill;
+                var damage = ent.Comp.BaseDamage + ent.Comp.Kills * ent.Comp.DamagePerKill;
                 _popup.PopupEntity(
-                    Loc.GetString("maniac-hands-kill", ("kills", armComp.Kills), ("damage", damage)),
+                    Loc.GetString("maniac-hands-kill", ("kills", ent.Comp.Kills), ("damage", damage)),
                     ent, PopupType.Medium);
 
-                UpdateAlert(ent, armComp.Kills);
+                UpdateAlert(ent, ent.Comp.Kills);
             }
         }
 
@@ -113,44 +152,9 @@ public sealed class ManiacHandsSystem : EntitySystem
         DrainSanity(ent);
     }
 
-    private void OnArmAdded(Entity<ManiacHandsArmComponent> arm, ref OrganAddedEvent args)
-    {
-        if (args.Body is not { Valid: true } body)
-            return;
-
-        var host = EnsureComp<ManiacHandsComponent>(body);
-        host.Arm = arm.Owner;
-        Dirty(body, host);
-    }
-
-    private void OnArmRemoved(Entity<ManiacHandsArmComponent> arm, ref OrganRemovedEvent args)
-    {
-        if (args.OldBody is not { Valid: true } body)
-            return;
-
-        _alerts.ClearAlert(body, "ManiacHandsKills");
-
-        if (TryComp<ManiacHandsComponent>(body, out var host))
-        {
-            if (host.Arm == arm.Owner)
-                host.Arm = null;
-
-            // No Maniac Hands arms left in the body: drop the host component.
-            if (host.Arm is not { Valid: true }
-                && TryComp<BodyComponent>(body, out _)
-                && !_body.TryGetBodyOrganEntityComps<ManiacHandsArmComponent>((body, null), out _))
-            {
-                EntityManager.RemoveComponent<ManiacHandsComponent>(body);
-                return;
-            }
-
-            Dirty(body, host);
-        }
-    }
-
     private void UpdateAlert(Entity<ManiacHandsComponent> ent, int kills)
     {
-        _alerts.ShowAlert(ent.Owner, "ManiacHandsKills", (short) SeverityFromKills(kills));
+        _alerts.ShowAlert(ent.Owner, "ManiacHandsKills", (short)SeverityFromKills(kills));
 
         // One-off dramatic killstreak announcements.
         string? msg = kills switch
@@ -163,13 +167,13 @@ public sealed class ManiacHandsSystem : EntitySystem
         if (msg is null)
             return;
 
-        if (!TryComp<ActorComponent>(ent, out var actor))
+        if (!TryComp<ActorComponent>(ent.Owner, out var actor))
             return;
 
         _chat.DispatchServerMessage(actor.PlayerSession, msg);
 
         var popupType = kills >= 8 ? PopupType.LargeCaution : PopupType.MediumCaution;
-        _popup.PopupEntity(msg, ent, ent, popupType);
+        _popup.PopupEntity(msg, ent.Owner, ent.Owner, popupType);
     }
 
     private static int SeverityFromKills(int kills)
@@ -185,20 +189,19 @@ public sealed class ManiacHandsSystem : EntitySystem
 
     private void DrainSanity(Entity<ManiacHandsComponent> ent)
     {
-        if (!TryComp<CyberpsychosisComponent>(ent, out var cyber))
+        if (!TryComp<CyberpsychosisComponent>(ent.Owner, out var cyber))
             return;
 
-        // If sanity is already 0, stop draining — avoids re-triggering death.
         if (cyber.SanityValue <= 0)
             return;
 
         ent.Comp.SanityDrainBuffer += ent.Comp.SanityDrainPerPunch;
-        var whole = (int) ent.Comp.SanityDrainBuffer;
+        var whole = (int)ent.Comp.SanityDrainBuffer;
         if (whole <= 0)
             return;
 
         ent.Comp.SanityDrainBuffer -= whole;
         cyber.SanityValue = Math.Clamp(cyber.SanityValue - whole, 0, cyber.BaseSanity);
-        _cyberpsychosis.RefreshAlert(ent, cyber);
+        _cyberpsychosis.RefreshAlert(ent.Owner, cyber);
     }
 }

@@ -6,36 +6,56 @@ using Robust.Shared.GameStates;
 namespace Content.Pirate.Shared.Implants.ManiacHands;
 
 /// <summary>
-///     Added to the host while the Maniac Hands cybernetic arm is installed.
-///     The permanent kill counter lives on <see cref="ManiacHandsArmComponent"/>
-///     so it survives surgical extraction and re-installation.
+///     Which hand the ManiacHandComponent is on.
 /// </summary>
-[RegisterComponent, NetworkedComponent]
+public enum HandSide : byte
+{
+    Left,
+    Right
+}
+
+/// <summary>
+///     Added to the host while BOTH Maniac Hands are installed.
+///     The kill counter lives here and persists while at least one hand remains.
+/// </summary>
+[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
 public sealed partial class ManiacHandsComponent : Component
 {
     /// <summary>
-    ///     The cybernetic arm entity backing these hands.
+    ///     The left maniac hand entity (if installed).
     /// </summary>
     [DataField]
-    public EntityUid? Arm;
+    public EntityUid? LeftHand;
+
+    /// <summary>
+    ///     The right maniac hand entity (if installed).
+    /// </summary>
+    [DataField]
+    public EntityUid? RightHand;
 
     /// <summary>
     ///     Damage dealt by an empty-handed strike with no accumulated kills.
     /// </summary>
     [DataField]
-    public int BaseDamage = 28;
+    public int BaseDamage = 27;
 
     /// <summary>
     ///     Extra damage per accumulated kill.
     /// </summary>
     [DataField]
-    public int DamagePerKill = 4;
+    public int DamagePerKill = 3;
 
     /// <summary>
     ///     Sanity drained per empty-handed strike.
     /// </summary>
     [DataField]
-    public float SanityDrainPerPunch = 0.7f;
+    public float SanityDrainPerPunch = 0.5f;
+
+    /// <summary>
+    ///     Total kills accumulated across both hands.
+    /// </summary>
+    [DataField, AutoNetworkedField]
+    public int Kills;
 
     /// <summary>
     ///     Fractional sanity drain accumulator, flushed into the integer

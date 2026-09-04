@@ -1,3 +1,4 @@
+using System.Linq;
 using Content.Pirate.Shared.Implants.Cyberpsychosis;
 using Content.Pirate.Shared.Implants.ManiacHands;
 using Content.Server.Mind;
@@ -8,6 +9,7 @@ using Content.Shared.Alert;
 using Content.Shared.Body.Components;
 using Content.Shared.Body.Events;
 using Content.Shared.Body.Organ;
+using Content.Shared.Body.Part;
 using Content.Shared.Body.Systems;
 using Content.Shared.CombatMode;
 using Content.Shared.Damage;
@@ -221,12 +223,15 @@ public sealed class CyberpsychosisSystem : EntitySystem
         RaiseLocalEvent(mob, new RejuvenateEvent(false, false));
         _mobState.ChangeMobState(mob, MobState.Alive);
 
-        // Check if the body has Maniac Hands arm installed.
+        // Check if the body has BOTH Maniac Hands installed (paired cybernetic hands).
         bool hasManiacHands = false;
-        if (TryComp<BodyComponent>(mob, out _) &&
-            _body.TryGetBodyOrganEntityComps<ManiacHandsArmComponent>((mob, null), out var organs))
+        if (TryComp<BodyComponent>(mob, out _))
         {
-            hasManiacHands = organs.Count > 0;
+            // Find all body parts with ManiacHandComponent.
+            var hands = _body.GetBodyPartChildrenWithComponent<ManiacHandComponent>(mob).ToList();
+            bool hasLeft = hands.Any(h => h.Component.Side == HandSide.Left);
+            bool hasRight = hands.Any(h => h.Component.Side == HandSide.Right);
+            hasManiacHands = hasLeft && hasRight;
         }
 
         if (!hasManiacHands)

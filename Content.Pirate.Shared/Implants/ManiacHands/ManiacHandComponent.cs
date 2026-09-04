@@ -6,15 +6,14 @@ using Robust.Shared.GameStates;
 namespace Content.Pirate.Shared.Implants.ManiacHands;
 
 /// <summary>
-///     Lives on the Maniac Hands cybernetic arm and keeps the permanent
-///     kill counter, which is persisted across surgical extraction and re-installation.
+///     Marks a cybernetic hand as part of the Maniac Hands pair.
 /// </summary>
 [RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
-public sealed partial class ManiacHandsArmComponent : Component
+public sealed partial class ManiacHandComponent : Component
 {
     /// <summary>
-    ///     How many kills the host has accumulated with these hands.
+    ///     Which hand this is (Left or Right).
     /// </summary>
     [DataField, AutoNetworkedField]
-    public int Kills;
+    public HandSide Side;
 }

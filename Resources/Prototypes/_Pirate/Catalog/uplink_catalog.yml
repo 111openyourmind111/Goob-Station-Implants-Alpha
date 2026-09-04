@@ -273,7 +273,7 @@
   name: uplink-maniac-hands-name
   description: uplink-maniac-hands-desc
   icon: { sprite: _Goobstation/Actions/kravmaga.rsi, state: lungpunch }
-  productEntity: ManiacHandsArm
+  productEntity: ManiacHandsPair
   cost:
     Telecrystal: 30
   categories:

@@ -1,0 +1,46 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+# Maniac Hands — paired cybernetic hand replacements.
+# Install via standard hand-attachment surgery (SurgeryAttachLeftHand/RightHand).
+# When BOTH hands are installed on the same body, the Maniac Hands mechanic activates:
+# empty-handed strikes deal escalating damage per kill, with sanity drain.
+
+- type: entity
+  parent: [LeftHandCybernetic, BaseCyberneticOrgan]
+  id: ManiacLeftHand
+  name: maniac left hand
+  description: A cybernetic left hand with built-in murder-lust. Install on both hands to awaken the maniac within.
+  components:
+  - type: Sprite
+    state: strength
+  - type: ManiacHand
+    side: Left
+
+- type: entity
+  parent: [RightHandCybernetic, BaseCyberneticOrgan]
+  id: ManiacRightHand
+  name: maniac right hand
+  description: A cybernetic right hand with built-in murder-lust. Install on both hands to awaken the maniac within.
+  components:
+  - type: Sprite
+    state: strength
+  - type: ManiacHand
+    side: Right
+
+- type: entity
+  id: ManiacHandsPair
+  name: maniac hands pair
+  description: A case containing a matched pair of Maniac Hands cybernetic replacements. Install both to awaken the maniac within.
+  components:
+  - type: Storage
+    maxItemSize: Normal
+    defaultStorageOrientation: Vertical
+  - type: Item
+    size: Normal
+  - type: Sprite
+    sprite: _Goobstation/Actions/kravmaga.rsi
+    state: lungpunch
+  - type: FillContainer
+    contents:
+    - ManiacLeftHand
+    - ManiacRightHand
