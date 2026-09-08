@@ -6,7 +6,7 @@
 # empty-handed strikes deal escalating damage per kill, with sanity drain.
 
 - type: entity
-  parent: [LeftHandCybernetic, BaseCyberneticOrgan]
+  parent: LeftHandCybernetic
   id: ManiacLeftHand
   name: maniac left hand
   description: A cybernetic left hand with built-in murder-lust. Install on both hands to awaken the maniac within.
@@ -15,9 +15,11 @@
     state: strength
   - type: ManiacHand
     side: Left
+  - type: CyberpsychosisLoad
+    sanityCost: 7.5
 
 - type: entity
-  parent: [RightHandCybernetic, BaseCyberneticOrgan]
+  parent: RightHandCybernetic
   id: ManiacRightHand
   name: maniac right hand
   description: A cybernetic right hand with built-in murder-lust. Install on both hands to awaken the maniac within.
@@ -26,11 +28,13 @@
     state: strength
   - type: ManiacHand
     side: Right
+  - type: CyberpsychosisLoad
+    sanityCost: 7.5
 
 - type: entity
   id: ManiacHandsPair
   name: maniac hands pair
-  description: A case containing a matched pair of Maniac Hands cybernetic replacements. Install both to awaken the maniac within.
+  description: A case containing a matched pair of Maniac Hands cybernetic replacements. Install both hands to awaken the maniac within.
   components:
   - type: Storage
     maxItemSize: Normal
