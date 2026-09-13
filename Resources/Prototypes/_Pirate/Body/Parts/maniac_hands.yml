@@ -44,7 +44,7 @@
   - type: Sprite
     sprite: _Goobstation/Actions/kravmaga.rsi
     state: lungpunch
-  - type: FillContainer
+  - type: StorageFill
     contents:
-    - ManiacLeftHand
-    - ManiacRightHand
+    - id: ManiacLeftHand
+    - id: ManiacRightHand
