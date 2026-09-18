@@ -269,12 +269,23 @@
   - UplinkWearables
 
 - type: listing
-  id: UplinkManiacHands
-  name: uplink-maniac-hands-name
-  description: uplink-maniac-hands-desc
-  icon: { sprite: _Goobstation/Actions/kravmaga.rsi, state: lungpunch }
-  productEntity: ManiacHandsPair
+  id: UplinkManiacLeftHand
+  name: uplink-maniac-left-hand-name
+  description: uplink-maniac-left-hand-desc
+  icon: { sprite: _Pirate/Implants/ManiacHands/maniac_hands.rsi, state: maniac_hands_left }
+  productEntity: ManiacLeftHand
   cost:
-    Telecrystal: 30
+    Telecrystal: 15
+  categories:
+  - UplinkImplants
+
+- type: listing
+  id: UplinkManiacRightHand
+  name: uplink-maniac-right-hand-name
+  description: uplink-maniac-right-hand-desc
+  icon: { sprite: _Pirate/Implants/ManiacHands/maniac_hands.rsi, state: maniac_hands_right }
+  productEntity: ManiacRightHand
+  cost:
+    Telecrystal: 15
   categories:
   - UplinkImplants

@@ -9,5 +9,8 @@ maniac-hands-streak-triple-kill = Triple Kill!!!!!
 maniac-hands-streak-bloodshed = BLOODSHED
 maniac-hands-streak-rageee = RAGEEEE!!!!!!
 
-uplink-maniac-hands-name = Maniac Hands Pair
-uplink-maniac-hands-desc = A case containing a matched pair of Maniac Hands cybernetic replacements. Install both hands to awaken the maniac: empty-handed strikes deal 27 damage, +3 per kill. Each punch drains 0.5 sanity (stops at 0). 30 TC.
+uplink-maniac-left-hand-name = Maniac Left Hand
+uplink-maniac-left-hand-desc = A cybernetic left hand replacement. Install with its right counterpart to awaken the maniac: empty-handed strikes deal 27 damage, +3 per kill. Each punch drains 0.5 sanity (stops at 0). 15 TC.
+
+uplink-maniac-right-hand-name = Maniac Right Hand
+uplink-maniac-right-hand-desc = A cybernetic right hand replacement. Install with its left counterpart to awaken the maniac: empty-handed strikes deal 27 damage, +3 per kill. Each punch drains 0.5 sanity (stops at 0). 15 TC.

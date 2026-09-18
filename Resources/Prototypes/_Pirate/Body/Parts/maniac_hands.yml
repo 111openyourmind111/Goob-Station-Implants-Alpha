@@ -32,21 +32,3 @@
     side: Right
   - type: CyberpsychosisLoad
     sanityCost: 7.5
-
-- type: entity
-  id: ManiacHandsPair
-  name: maniac hands pair
-  description: A case containing a matched pair of Maniac Hands cybernetic replacements. Install both hands to awaken the maniac within.
-  components:
-  - type: Storage
-    maxItemSize: Normal
-    defaultStorageOrientation: Vertical
-  - type: Item
-    size: Normal
-  - type: Sprite
-    sprite: _Pirate/Implants/ManiacHands/maniac_hands.rsi
-    state: maniac_hands
-  - type: StorageFill
-    contents:
-    - id: ManiacLeftHand
-    - id: ManiacRightHand
