@@ -1,16 +1,16 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
 # Custom Maniac Hands character overlay layers.
-# Uses the maniac_hands.png texture from the _Pirate/Implants/ManiacHands/maniac_hands.rsi sheet.
+# Uses separate left/right hand textures from maniac_hands.rsi.
 
 - type: humanoidBaseSprite
   id: MobManiacLeftHand
   baseSprite:
     sprite: _Pirate/Implants/ManiacHands/maniac_hands.rsi
-    state: maniac_hands
+    state: maniac_hands_l
 
 - type: humanoidBaseSprite
   id: MobManiacRightHand
   baseSprite:
     sprite: _Pirate/Implants/ManiacHands/maniac_hands.rsi
-    state: maniac_hands
+    state: maniac_hands_r
