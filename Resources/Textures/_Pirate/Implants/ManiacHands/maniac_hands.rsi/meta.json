@@ -3,8 +3,8 @@
   "license": "CC-BY-SA-3.0",
   "copyright": "Pirate Station Implants Contributors",
   "size": {
-    "x": 64,
-    "y": 64
+    "x": 32,
+    "y": 32
   },
   "states": [
     {
@@ -20,10 +20,12 @@
       "name": "maniac_8"
     },
     {
-      "name": "maniac_hands_l"
+      "name": "maniac_hands_l",
+      "directions": 4
     },
     {
-      "name": "maniac_hands_r"
+      "name": "maniac_hands_r",
+      "directions": 4
     },
     {
       "name": "maniac_hands_left"
