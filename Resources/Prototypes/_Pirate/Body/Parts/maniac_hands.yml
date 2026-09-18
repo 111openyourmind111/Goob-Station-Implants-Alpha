@@ -12,7 +12,8 @@
   description: A cybernetic left hand with built-in murder-lust. Install on both hands to awaken the maniac within.
   components:
   - type: Sprite
-    state: strength
+    sprite: _Pirate/Implants/ManiacHands/maniac_hands.rsi
+    state: maniac_hands_left
   - type: ManiacHand
     side: Left
   - type: CyberpsychosisLoad
@@ -25,7 +26,8 @@
   description: A cybernetic right hand with built-in murder-lust. Install on both hands to awaken the maniac within.
   components:
   - type: Sprite
-    state: strength
+    sprite: _Pirate/Implants/ManiacHands/maniac_hands.rsi
+    state: maniac_hands_right
   - type: ManiacHand
     side: Right
   - type: CyberpsychosisLoad
@@ -42,8 +44,8 @@
   - type: Item
     size: Normal
   - type: Sprite
-    sprite: _Goobstation/Actions/kravmaga.rsi
-    state: lungpunch
+    sprite: _Pirate/Implants/ManiacHands/maniac_hands.rsi
+    state: maniac_hands
   - type: StorageFill
     contents:
     - id: ManiacLeftHand

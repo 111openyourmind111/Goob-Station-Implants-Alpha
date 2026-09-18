@@ -18,6 +18,15 @@
     },
     {
       "name": "maniac_8"
+    },
+    {
+      "name": "maniac_hands"
+    },
+    {
+      "name": "maniac_hands_left"
+    },
+    {
+      "name": "maniac_hands_right"
     }
   ]
 }
