@@ -20,12 +20,10 @@
       "name": "maniac_8"
     },
     {
-      "name": "maniac_hands_l",
-      "directions": 4
+      "name": "maniac_hands_l"
     },
     {
-      "name": "maniac_hands_r",
-      "directions": 4
+      "name": "maniac_hands_r"
     },
     {
       "name": "maniac_hands_left"
