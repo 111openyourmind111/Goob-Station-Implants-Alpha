@@ -1,16 +1,4 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
-# Custom Maniac Hands character overlay layers.
-# Uses separate left/right hand textures from maniac_hands.rsi.
-
-- type: humanoidBaseSprite
-  id: MobManiacLeftHand
-  baseSprite:
-    sprite: _Pirate/Implants/ManiacHands/maniac_hands.rsi
-    state: maniac_hands_l
-
-- type: humanoidBaseSprite
-  id: MobManiacRightHand
-  baseSprite:
-    sprite: _Pirate/Implants/ManiacHands/maniac_hands.rsi
-    state: maniac_hands_r
+# Use existing Bishop cybernetic hand layers from Einstein Engines.
+# These are proven to work correctly with the humanoid rendering system.

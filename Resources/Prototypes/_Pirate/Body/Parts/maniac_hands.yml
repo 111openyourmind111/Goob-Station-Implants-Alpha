@@ -15,7 +15,7 @@
     sprite: _Pirate/Implants/ManiacHands/maniac_hands.rsi
     state: maniac_hands_left
   - type: BodyPart
-    baseLayerId: MobManiacLeftHand
+    baseLayerId: MobCyberneticBishopLHand
   - type: ManiacHand
     side: Left
   - type: CyberpsychosisLoad
@@ -31,7 +31,7 @@
     sprite: _Pirate/Implants/ManiacHands/maniac_hands.rsi
     state: maniac_hands_right
   - type: BodyPart
-    baseLayerId: MobManiacRightHand
+    baseLayerId: MobCyberneticBishopRHand
   - type: ManiacHand
     side: Right
   - type: CyberpsychosisLoad
