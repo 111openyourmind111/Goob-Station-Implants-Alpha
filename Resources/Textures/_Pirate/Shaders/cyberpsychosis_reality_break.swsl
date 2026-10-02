@@ -13,10 +13,10 @@ vec2 rotate(vec2 v, float a) {
 
 void main() {
     vec2 uv = VARYING_TEX_COORD;
-    vec4 color = texture(SCREEN_TEXTURE, VARYING_TEX_COORD);
+    vec4 screenColor = texture(SCREEN_TEXTURE, VARYING_TEX_COORD);
 
     if (realityBreakPower <= 0.0) {
-        gl_FragColor = color;
+        gl_FragColor = screenColor;
         return;
     }
 
@@ -39,15 +39,12 @@ void main() {
     float invertPulse = sin(time * 2.0) * 0.5 + 0.5;
     float invertAmount = realityBreakPower * invertPulse * 0.5;
 
-    // Time dilation effect - stretch time perception
-    float timeDilation = 1.0 + realityBreakPower * 0.5 * sin(time * 1.5);
-
     // Sample with distorted UV
     vec4 distortedColor = texture(SCREEN_TEXTURE, uv);
 
     // Color inversion
     vec3 inverted = 1.0 - distortedColor.rgb;
-    vec3 color = mix(distortedColor.rgb, inverted, invertAmount);
+    vec3 mixedColor = mix(distortedColor.rgb, inverted, invertAmount);
 
     // Vignette that closes in
     float vignette = 1.0 - length(VARYING_TEX_COORD - 0.5) * 2.0;
@@ -60,8 +57,7 @@ void main() {
     float g = distortedColor.g;
     float b = texture(SCREEN_TEXTURE, uv - vec2(aberration, 0.0)).b;
 
-    vec3 finalColor = vec3(r, g, b);
-    finalColor = mix(distortedColor.rgb, vec3(r, g, b), realityBreakPower * 0.4);
+    vec3 finalColor = mix(mixedColor, vec3(r, g, b), realityBreakPower * 0.4);
 
     // Scanline interference
     float interference = sin(VARYING_TEX_COORD.y * 800.0 + time * 30.0) * 0.03 * realityBreakPower;
@@ -69,7 +65,7 @@ void main() {
 
     // Digital noise
     float noise = fract(sin(dot(VARYING_TEX_COORD * 100.0, vec2(12.9898, 78.233)) + time * 10.0) * 43758.5453);
-    color += (noise - 0.5) * 0.1 * realityBreakPower;
+    finalColor += (noise - 0.5) * 0.1 * realityBreakPower;
 
     gl_FragColor = vec4(finalColor * vignette, 1.0);
 }

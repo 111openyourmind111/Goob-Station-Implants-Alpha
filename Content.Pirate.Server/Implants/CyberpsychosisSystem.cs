@@ -189,10 +189,10 @@ public sealed class CyberpsychosisSystem : EntitySystem
         Dirty(uid, component);
 
 if (oldState != newState)
-            {
-                var ev = new CyberpsychosisStateChangedEvent(oldState, newState);
-                RaiseLocalEvent(uid, ref ev);
-            }
+        {
+            var ev = new CyberpsychosisStateChangedEvent(oldState, newState);
+            RaiseLocalEvent(uid, ref ev);
+        }
 
         _alerts.ShowAlert(uid, "CyberpsychosisSanity", (short) severity);
 

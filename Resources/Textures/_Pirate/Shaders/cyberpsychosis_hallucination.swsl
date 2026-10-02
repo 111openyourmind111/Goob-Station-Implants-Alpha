@@ -49,7 +49,7 @@ void main() {
     finalColor += vec3(noise);
 
     // Vignette that increases with hallucination
-    float vignette = 1.0 - length(gl_FragCoord.xy / resolution.xy - 0.5) * 1.2;
+    float vignette = 1.0 - length(VARYING_TEX_COORD - 0.5) * 1.2;
     vignette = pow(vignette, 2.0);
     vignette = mix(1.0, vignette, hallucinationPower * 0.4);
 

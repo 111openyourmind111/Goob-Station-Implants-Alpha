@@ -92,28 +92,3 @@
   parent: [ StatusEffectWoozy, StatusEffectSlurred ]
   id: StatusEffectDrunk
   name: drunk
-
-# Cyberpsychosis visual effects
-# Hallucinations: chromatic aberration, noise, geometric distortions
-- type: entity
-  parent: MobStatusEffectBase
-  id: CyberpsychosisHallucination
-  name: cyberpsychosis hallucination
-  components:
-  - type: CyberpsychosisHallucinationComponent
-
-# Glitches: scanlines, tearing, pixel sorting
-- type: entity
-  parent: MobStatusEffectBase
-  id: CyberpsychosisGlitch
-  name: cyberpsychosis glitch
-  components:
-  - type: CyberpsychosisGlitchComponent
-
-# Severe reality distortion
-- type: entity
-  parent: MobStatusEffectBase
-  id: CyberpsychosisRealityBreak
-  name: cyberpsychosis reality break
-  components:
-  - type: CyberpsychosisRealityBreakComponent

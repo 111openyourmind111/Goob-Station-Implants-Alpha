@@ -40,11 +40,8 @@ public sealed class CyberpsychosisRealityBreakOverlay : Overlay
         if (!IoCManager.Resolve<IEntityManager>().TryGetComponent<CyberpsychosisComponent>(player, out var comp))
             return false;
 
-        // Only at sanity <= 0
-        if (comp.SanityValue > 0)
-            return false;
-
-        var intensity = MathHelper.Clamp(-comp.SanityValue / 50f, 0f, 1f);
+        // Ramped over the final stretch before sanity hits 0 and the mind breaks.
+        var intensity = CalculateIntensity(comp);
         if (intensity <= 0f)
             return false;
 
@@ -60,10 +57,7 @@ public sealed class CyberpsychosisRealityBreakOverlay : Overlay
         if (!IoCManager.Resolve<IEntityManager>().TryGetComponent<CyberpsychosisComponent>(player, out var comp))
             return;
 
-        if (comp.SanityValue > 0)
-            return;
-
-        var intensity = MathHelper.Clamp(-comp.SanityValue / 50f, 0f, 1f);
+        var intensity = CalculateIntensity(comp);
         if (intensity <= 0f)
             return;
 
@@ -76,5 +70,17 @@ public sealed class CyberpsychosisRealityBreakOverlay : Overlay
         _shader.SetParameter("SCREEN_TEXTURE", ScreenTexture);
         handle.DrawTextureRect(Texture.White, args.ViewportBounds);
         handle.UseShader(null);
+    }
+
+    /// <summary>
+    ///     Ramps from 0 at <see cref="CyberpsychosisComponent.SanityValue" /> 10 up to 1.0 at sanity 0,
+    ///     the point where the mind permanently breaks.
+    /// </summary>
+    private float CalculateIntensity(CyberpsychosisComponent comp)
+    {
+        if (comp.SanityValue > 10f)
+            return 0f;
+
+        return MathHelper.Clamp((10f - comp.SanityValue) / 10f, 0f, 1f);
     }
 }
