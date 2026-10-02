@@ -1,0 +1,57 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
+varying vec2 VARYING_TEX_COORD;
+uniform sampler2D SCREEN_TEXTURE;
+
+uniform float hallucinationPower;
+uniform float time;
+uniform float sanityNormalized;
+
+vec3 hash(vec2 p) {
+    p = vec2(dot(p, vec2(127.1, 311.7)), dot(p, vec2(269.5, 183.3)));
+    return fract(sin(p) * 43758.5453);
+}
+
+void main() {
+    vec2 uv = VARYING_TEX_COORD;
+    vec4 color = texture(SCREEN_TEXTURE, VARYING_TEX_COORD);
+
+    if (hallucinationPower <= 0.0) {
+        gl_FragColor = color;
+        return;
+    }
+
+    // Chromatic aberration
+    float aberration = hallucinationPower * 0.015;
+    float r = texture(SCREEN_TEXTURE, uv + vec2(aberration * sin(time * 12.0), 0.0)).r;
+    float g = texture(SCREEN_TEXTURE, uv).g;
+    float b = texture(SCREEN_TEXTURE, uv - vec2(aberration * cos(time * 12.0), 0.0)).b;
+
+    // Noise overlay
+    vec2 noiseUv = uv * 50.0 + time * 3.0;
+    float noise = hash(noiseUv).r * hallucinationPower * 0.08;
+
+    // Geometric distortion waves
+    vec2 distort = vec2(
+        sin(uv.y * 10.0 + time * 2.0) * 0.008,
+        cos(uv.x * 8.0 + time * 1.5) * 0.006
+    ) * hallucinationPower;
+
+    vec2 distortUv = uv + distort;
+
+    vec3 distortedColor = vec3(
+        texture(SCREEN_TEXTURE, distortUv + vec2(aberration * sin(time * 12.0), 0.0)).r,
+        texture(SCREEN_TEXTURE, distortUv).g,
+        texture(SCREEN_TEXTURE, distortUv - vec2(aberration * cos(time * 12.0), 0.0)).b
+    );
+
+    vec3 finalColor = mix(color.rgb, distortedColor, hallucinationPower * 0.6);
+    finalColor += vec3(noise);
+
+    // Vignette that increases with hallucination
+    float vignette = 1.0 - length(gl_FragCoord.xy / resolution.xy - 0.5) * 1.2;
+    vignette = pow(vignette, 2.0);
+    vignette = mix(1.0, vignette, hallucinationPower * 0.4);
+
+    gl_FragColor = vec4(finalColor * vignette, 1.0);
+}

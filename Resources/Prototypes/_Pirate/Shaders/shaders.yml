@@ -37,3 +37,18 @@
   id: GerasColorTint
   kind: source
   path: "/Textures/_Pirate/Shaders/geras_color_tint.swsl"
+
+- type: shader
+  id: CyberpsychosisHallucination
+  kind: source
+  path: "/Textures/_Pirate/Shaders/cyberpsychosis_hallucination.swsl"
+
+- type: shader
+  id: CyberpsychosisGlitch
+  kind: source
+  path: "/Textures/_Pirate/Shaders/cyberpsychosis_glitch.swsl"
+
+- type: shader
+  id: CyberpsychosisRealityBreak
+  kind: source
+  path: "/Textures/_Pirate/Shaders/cyberpsychosis_reality_break.swsl"

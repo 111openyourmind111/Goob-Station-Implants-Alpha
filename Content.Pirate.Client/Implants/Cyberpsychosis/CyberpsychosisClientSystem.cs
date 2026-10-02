@@ -1,4 +1,7 @@
 using Content.Pirate.Shared.Implants.Cyberpsychosis;
+using Content.Shared._DV.CCVars;
+using Content.Shared._DV.CCVars;
+using Content.Shared._DV.CCVars;
 using Robust.Shared.GameObjects;
 
 namespace Content.Pirate.Client.Implants.Cyberpsychosis;

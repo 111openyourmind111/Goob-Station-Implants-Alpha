@@ -181,10 +181,18 @@ public sealed class CyberpsychosisSystem : EntitySystem
 
     public void RefreshAlert(EntityUid uid, CyberpsychosisComponent component)
     {
+        var oldState = component.CurrentState;
         var severity = SeverityFromSanity(component);
+        var newState = (SanityState)(severity - 1);
 
-        component.CurrentState = (SanityState)(severity - 1);
+        component.CurrentState = newState;
         Dirty(uid, component);
+
+if (oldState != newState)
+            {
+                var ev = new CyberpsychosisStateChangedEvent(oldState, newState);
+                RaiseLocalEvent(uid, ref ev);
+            }
 
         _alerts.ShowAlert(uid, "CyberpsychosisSanity", (short) severity);
 
