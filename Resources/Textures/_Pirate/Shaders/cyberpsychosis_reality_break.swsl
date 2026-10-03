@@ -1,71 +1,69 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-varying vec2 VARYING_TEX_COORD;
 uniform sampler2D SCREEN_TEXTURE;
 
-uniform float realityBreakPower;
-uniform float time;
+uniform highp float realityBreakPower;
+uniform highp float time;
 
-vec2 rotate(vec2 v, float a) {
-    float s = sin(a), c = cos(a);
+highp vec2 rotate(highp vec2 v, highp float a) {
+    highp float s = sin(a), c = cos(a);
     return mat2(c, -s, s, c) * v;
 }
 
-void main() {
-    vec2 uv = VARYING_TEX_COORD;
-    vec4 screenColor = texture(SCREEN_TEXTURE, VARYING_TEX_COORD);
+void fragment() {
+    highp vec2 uv = Pos;
+    highp vec4 screenColor = texture(SCREEN_TEXTURE, Pos);
 
     if (realityBreakPower <= 0.0) {
-        gl_FragColor = screenColor;
+        COLOR = screenColor;
         return;
     }
 
     // Center for radial effects
-    vec2 center = vec2(0.5, 0.5);
-    vec2 diff = uv - center;
-    float dist = length(diff);
-    float angle = atan(diff.y, diff.x);
+    highp vec2 center = vec2(0.5, 0.5);
+    highp vec2 diff = uv - center;
+    highp float dist = length(diff);
 
     // Geometry warping - spiral distortion
-    float spiral = realityBreakPower * 0.5;
-    float spiralFactor = 1.0 + spiral * sin(dist * 20.0 - time * 3.0) * 0.1;
+    highp float spiral = realityBreakPower * 0.5;
+    highp float spiralFactor = 1.0 + spiral * sin(dist * 20.0 - time * 3.0) * 0.1;
     uv = center + diff * spiralFactor;
 
     // Rotation that increases with time
-    float rotation = realityBreakPower * sin(time * 0.5) * 0.3;
+    highp float rotation = realityBreakPower * sin(time * 0.5) * 0.3;
     uv = center + rotate(uv - center, rotation);
 
     // Color inversion pulses
-    float invertPulse = sin(time * 2.0) * 0.5 + 0.5;
-    float invertAmount = realityBreakPower * invertPulse * 0.5;
+    highp float invertPulse = sin(time * 2.0) * 0.5 + 0.5;
+    highp float invertAmount = realityBreakPower * invertPulse * 0.5;
 
     // Sample with distorted UV
-    vec4 distortedColor = texture(SCREEN_TEXTURE, uv);
+    highp vec4 distortedColor = texture(SCREEN_TEXTURE, uv);
 
     // Color inversion
-    vec3 inverted = 1.0 - distortedColor.rgb;
-    vec3 mixedColor = mix(distortedColor.rgb, inverted, invertAmount);
+    highp vec3 inverted = 1.0 - distortedColor.rgb;
+    highp vec3 mixedColor = mix(distortedColor.rgb, inverted, invertAmount);
 
     // Vignette that closes in
-    float vignette = 1.0 - length(VARYING_TEX_COORD - 0.5) * 2.0;
+    highp float vignette = 1.0 - length(Pos - 0.5) * 2.0;
     vignette = pow(vignette, 3.0);
     vignette = mix(1.0, vignette, realityBreakPower * 0.6);
 
     // Chromatic aberration
-    float aberration = realityBreakPower * 0.02;
-    float r = texture(SCREEN_TEXTURE, uv + vec2(aberration, 0.0)).r;
-    float g = distortedColor.g;
-    float b = texture(SCREEN_TEXTURE, uv - vec2(aberration, 0.0)).b;
+    highp float aberration = realityBreakPower * 0.02;
+    highp float r = texture(SCREEN_TEXTURE, uv + vec2(aberration, 0.0)).r;
+    highp float g = distortedColor.g;
+    highp float b = texture(SCREEN_TEXTURE, uv - vec2(aberration, 0.0)).b;
 
-    vec3 finalColor = mix(mixedColor, vec3(r, g, b), realityBreakPower * 0.4);
+    highp vec3 finalColor = mix(mixedColor, vec3(r, g, b), realityBreakPower * 0.4);
 
     // Scanline interference
-    float interference = sin(VARYING_TEX_COORD.y * 800.0 + time * 30.0) * 0.03 * realityBreakPower;
+    highp float interference = sin(Pos.y * 800.0 + time * 30.0) * 0.03 * realityBreakPower;
     finalColor += vec3(interference);
 
     // Digital noise
-    float noise = fract(sin(dot(VARYING_TEX_COORD * 100.0, vec2(12.9898, 78.233)) + time * 10.0) * 43758.5453);
+    highp float noise = fract(sin(dot(Pos * 100.0, vec2(12.9898, 78.233)) + time * 10.0) * 43758.5453);
     finalColor += (noise - 0.5) * 0.1 * realityBreakPower;
 
-    gl_FragColor = vec4(finalColor * vignette, 1.0);
+    COLOR = vec4(finalColor * vignette, 1.0);
 }

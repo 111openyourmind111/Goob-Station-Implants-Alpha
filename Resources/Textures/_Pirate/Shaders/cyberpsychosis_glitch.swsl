@@ -1,62 +1,61 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-varying vec2 VARYING_TEX_COORD;
 uniform sampler2D SCREEN_TEXTURE;
 
-uniform float glitchPower;
-uniform float time;
-uniform float sanityNormalized;
+uniform highp float glitchPower;
+uniform highp float time;
+uniform highp float sanityNormalized;
 
-float rand(vec2 co) {
+highp float rand(highp vec2 co) {
     return fract(sin(dot(co.xy, vec2(12.9898, 78.233))) * 43758.5453);
 }
 
-void main() {
-    vec2 uv = VARYING_TEX_COORD;
-    vec4 color = texture(SCREEN_TEXTURE, VARYING_TEX_COORD);
+void fragment() {
+    highp vec2 uv = Pos;
+    highp vec4 color = texture(SCREEN_TEXTURE, Pos);
 
     if (glitchPower <= 0.0) {
-        gl_FragColor = color;
+        COLOR = color;
         return;
     }
 
     // Scanlines
-    float scanline = sin(uv.y * 800.0 + time * 50.0) * 0.02 * glitchPower;
-    vec2 scanUv = uv + vec2(0.0, scanline);
+    highp float scanline = sin(uv.y * 800.0 + time * 50.0) * 0.02 * glitchPower;
+    highp vec2 scanUv = uv + vec2(0.0, scanline);
 
     // Horizontal tearing / pixel sorting
-    float tearOffset = 0.0;
+    highp float tearOffset = 0.0;
     if (rand(vec2(floor(uv.y * 40.0), time * 10.0)) < 0.02 * glitchPower) {
         tearOffset = (rand(vec2(floor(uv.y * 40.0), time * 10.0 + 100.0)) - 0.5) * 0.1 * glitchPower;
     }
 
     // RGB channel separation during glitches
-    float r = texture(SCREEN_TEXTURE, uv + vec2(tearOffset + 0.003 * glitchPower, 0.0)).r;
-    float g = texture(SCREEN_TEXTURE, uv + vec2(0.0, scanline)).g;
-    float b = texture(SCREEN_TEXTURE, uv - vec2(tearOffset + 0.003 * glitchPower, 0.0)).b;
+    highp float r = texture(SCREEN_TEXTURE, uv + vec2(tearOffset + 0.003 * glitchPower, 0.0)).r;
+    highp float g = texture(SCREEN_TEXTURE, uv + vec2(0.0, scanline)).g;
+    highp float b = texture(SCREEN_TEXTURE, uv - vec2(tearOffset + 0.003 * glitchPower, 0.0)).b;
 
     // Pixel sorting blocks
-    float blockGlitch = 0.0;
+    highp float blockGlitch = 0.0;
     if (rand(vec2(floor(uv.x * 20.0), floor(uv.y * 20.0) + time * 2.0)) < 0.01 * glitchPower) {
         blockGlitch = 1.0;
     }
 
-    vec3 glitchColor = vec3(r, g, b);
+    highp vec3 glitchColor = vec3(r, g, b);
     if (blockGlitch > 0.5) {
         // Pixel sort effect - shift horizontally
-        float sortShift = sin(time * 30.0 + uv.y * 50.0) * 0.05 * glitchPower;
+        highp float sortShift = sin(time * 30.0 + uv.y * 50.0) * 0.05 * glitchPower;
         glitchColor = texture(SCREEN_TEXTURE, uv + vec2(sortShift, 0.0)).rgb;
     }
 
     // Scanline darkening
-    float scanDark = 1.0 - sin(uv.y * 600.0) * 0.1 * glitchPower;
+    highp float scanDark = 1.0 - sin(uv.y * 600.0) * 0.1 * glitchPower;
 
     // Static noise
-    float staticNoise = (rand(uv * 100.0 + time * 20.0) - 0.5) * 0.1 * glitchPower;
+    highp float staticNoise = (rand(uv * 100.0 + time * 20.0) - 0.5) * 0.1 * glitchPower;
 
-    vec3 finalColor = mix(color.rgb, glitchColor, glitchPower * 0.7);
+    highp vec3 finalColor = mix(color.rgb, glitchColor, glitchPower * 0.7);
     finalColor *= scanDark;
     finalColor += vec3(staticNoise);
 
-    gl_FragColor = vec4(finalColor, 1.0);
+    COLOR = vec4(finalColor, 1.0);
 }
