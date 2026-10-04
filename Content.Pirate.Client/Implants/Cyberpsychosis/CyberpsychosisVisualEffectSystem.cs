@@ -1,7 +1,9 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 using Robust.Client.Graphics;
+using Robust.Shared.Prototypes;
 using Robust.Shared.GameObjects;
+using Robust.Shared.Log;
 
 namespace Content.Pirate.Client.Implants.Cyberpsychosis;
 
@@ -32,7 +34,22 @@ namespace Content.Pirate.Client.Implants.Cyberpsychosis;
 /// </remarks>
 public sealed class CyberpsychosisVisualEffectSystem : EntitySystem
 {
+    /// <summary>
+    ///     Shader prototype ids, kept in sync with
+    ///     <c>Resources/Prototypes/_Pirate/Shaders/shaders.yml</c>. These are checked
+    ///     at startup so a renamed or missing prototype is reported immediately
+    ///     instead of silently failing inside <c>Overlay.Draw</c>.
+    /// </summary>
+    private static readonly string[] ShaderIds =
+    [
+        "CyberpsychosisHallucination",
+        "CyberpsychosisGlitch",
+        "CyberpsychosisRealityBreak"
+    ];
+
     [Dependency] private readonly IOverlayManager _overlayManager = default!;
+    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
+    [Dependency] private readonly ILogManager _log = default!;
 
     public override void Initialize()
     {
@@ -46,5 +63,25 @@ public sealed class CyberpsychosisVisualEffectSystem : EntitySystem
 
         if (!_overlayManager.HasOverlay<CyberpsychosisRealityBreakOverlay>())
             _overlayManager.AddOverlay(new CyberpsychosisRealityBreakOverlay());
+
+        ValidateShaders();
+    }
+
+    private void ValidateShaders()
+    {
+        var sawmill = _log.GetSawmill("cyberpsychosis");
+
+        foreach (var id in ShaderIds)
+        {
+            if (!_prototypeManager.Resolve<ShaderPrototype>(id, out _))
+                sawmill.Error($"Shader prototype '{id}' is missing; cyberpsychosis overlays will not render.");
+            else
+                sawmill.Debug($"Shader prototype '{id}' OK.");
+        }
+
+        sawmill.Info(
+            $"Registered cyberpsychosis overlays (hallucination={_overlayManager.HasOverlay<CyberpsychosisHallucinationOverlay>()}, " +
+            $"glitch={_overlayManager.HasOverlay<CyberpsychosisGlitchOverlay>()}, " +
+            $"realityBreak={_overlayManager.HasOverlay<CyberpsychosisRealityBreakOverlay>()}).");
     }
 }
