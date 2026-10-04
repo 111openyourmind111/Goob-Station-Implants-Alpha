@@ -77,6 +77,8 @@ public sealed class CyberpsychosisGlitchOverlay : Overlay
         if (comp.CurrentState < SanityState.Cyberpsychosis)
             return 0f;
 
-        return MathHelper.Clamp((20f - comp.SanityValue) / 20f, 0f, 1f);
+        var glitch = CyberpsychosisThresholds.Glitch;
+
+        return MathHelper.Clamp((glitch - comp.SanityValue) / (float) glitch, 0f, 1f);
     }
 }

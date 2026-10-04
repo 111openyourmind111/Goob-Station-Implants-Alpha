@@ -188,7 +188,7 @@ public sealed class CyberpsychosisSystem : EntitySystem
         component.CurrentState = newState;
         Dirty(uid, component);
 
-if (oldState != newState)
+        if (oldState != newState)
         {
             var ev = new CyberpsychosisStateChangedEvent(oldState, newState);
             RaiseLocalEvent(uid, ref ev);
@@ -284,9 +284,9 @@ if (oldState != newState)
     {
         return c.SanityValue switch
         {
-            > 70 => 1,
-            > 45 => 2,
-            > 20 => 3,
+            > CyberpsychosisThresholds.RealityBreak => 1,
+            > CyberpsychosisThresholds.Hallucination => 2,
+            > CyberpsychosisThresholds.Glitch => 3,
             _ => 4
         };
     }

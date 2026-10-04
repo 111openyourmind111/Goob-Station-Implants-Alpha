@@ -12,6 +12,35 @@ public enum SanityState : byte
     Cyberpsychosis = 3,
 }
 
+/// <summary>
+///     Sanity boundaries that drive cyberpsychosis escalation.
+/// </summary>
+/// <remarks>
+///     These live here, in the shared project, because both the server (alert severity
+///     and <see cref="SanityState" />) and the client (visual effect overlays) need to
+///     agree on them. They used to be hardcoded independently in three separate files,
+///     which let the visuals and the alerts drift apart.
+/// </remarks>
+public static class CyberpsychosisThresholds
+{
+    /// <summary>
+    ///     Sanity at which the player stops being <see cref="SanityState.Normal" />.
+    ///     Also where the reality break overlay starts, ramping up to full at sanity 0.
+    /// </summary>
+    public const int RealityBreak = 60;
+
+    /// <summary>
+    ///     Sanity at which the hallucination overlay begins ramping in.
+    /// </summary>
+    public const int Hallucination = 45;
+
+    /// <summary>
+    ///     Sanity at which the glitch overlay begins, and where
+    ///     <see cref="SanityState.Cyberpsychosis" /> begins.
+    /// </summary>
+    public const int Glitch = 20;
+}
+
 [RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
 public sealed partial class CyberpsychosisComponent : Component
 {

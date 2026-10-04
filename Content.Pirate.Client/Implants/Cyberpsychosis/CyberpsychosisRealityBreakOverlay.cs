@@ -73,14 +73,18 @@ public sealed class CyberpsychosisRealityBreakOverlay : Overlay
     }
 
     /// <summary>
-    ///     Ramps from 0 at <see cref="CyberpsychosisComponent.SanityValue" /> 10 up to 1.0 at sanity 0,
-    ///     the point where the mind permanently breaks.
+    ///     Ramps from 0 at <see cref="CyberpsychosisComponent.SanityValue" />
+    ///     <see cref="CyberpsychosisThresholds.RealityBreak" /> up to 1.0 at sanity 0,
+    ///     the point where the mind permanently breaks. The reality break is the
+    ///     earliest stage, so it is visible for most of the descent.
     /// </summary>
     private float CalculateIntensity(CyberpsychosisComponent comp)
     {
-        if (comp.SanityValue > 10f)
+        var threshold = CyberpsychosisThresholds.RealityBreak;
+
+        if (comp.SanityValue > threshold)
             return 0f;
 
-        return MathHelper.Clamp((10f - comp.SanityValue) / 10f, 0f, 1f);
+        return MathHelper.Clamp((threshold - comp.SanityValue) / (float) threshold, 0f, 1f);
     }
 }
