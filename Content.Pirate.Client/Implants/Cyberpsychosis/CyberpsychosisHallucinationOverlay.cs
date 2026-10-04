@@ -17,11 +17,11 @@ namespace Content.Pirate.Client.Implants.Cyberpsychosis;
 /// </summary>
 public sealed class CyberpsychosisHallucinationOverlay : Overlay
 {
-    private readonly IConfigurationManager _cfg = default!;
-    private readonly IPrototypeManager _prototypeManager = default!;
-    private readonly IGameTiming _timing = default!;
-    private readonly IEntityManager _entityManager = default!;
-    private readonly IPlayerManager _playerManager = default!;
+    [Dependency] private readonly IConfigurationManager _cfg = default!;
+    [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
+    [Dependency] private readonly IEntityManager _entityManager = default!;
+    [Dependency] private readonly IPlayerManager _playerManager = default!;
 
     private ShaderInstance? _shader;
 
