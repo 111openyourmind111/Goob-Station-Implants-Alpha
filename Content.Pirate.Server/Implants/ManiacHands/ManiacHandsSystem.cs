@@ -105,6 +105,12 @@ public sealed class ManiacHandsSystem : EntitySystem
         if (args.Handled || !args.IsHit)
             return;
 
+        // The mechanic only works with both hands installed. ManiacHandsComponent is
+        // created as soon as the first hand is attached (so the kill counter survives
+        // losing one), so it can be present on a half-paired body.
+        if (!HasBothHands(ent.Owner))
+            return;
+
         // Only boost natural, empty-handed punches.
         if (args.Weapon != args.User)
             return;
@@ -125,7 +131,7 @@ public sealed class ManiacHandsSystem : EntitySystem
 
     private void OnAfterMeleeHit(Entity<ManiacHandsComponent> ent, ref AfterMeleeHitEvent args)
     {
-        if (args.IsHit && args.Weapon == args.User)
+        if (args.IsHit && args.Weapon == args.User && HasBothHands(ent.Owner))
         {
             var kills = 0;
             foreach (var target in args.HitEntities)
@@ -149,7 +155,20 @@ public sealed class ManiacHandsSystem : EntitySystem
         }
 
         ent.Comp.HitTargets.Clear();
-        DrainSanity(ent);
+
+        if (HasBothHands(ent.Owner))
+            DrainSanity(ent);
+    }
+
+    /// <summary>
+    ///     Whether the paired Maniac Hands mechanic is actually active on this body,
+    ///     i.e. both a left and a right hand are installed.
+    /// </summary>
+    private bool HasBothHands(EntityUid host)
+    {
+        return TryComp<ManiacHandsComponent>(host, out var comp)
+            && comp.LeftHand is { Valid: true }
+            && comp.RightHand is { Valid: true };
     }
 
     private void UpdateAlert(Entity<ManiacHandsComponent> ent, int kills)

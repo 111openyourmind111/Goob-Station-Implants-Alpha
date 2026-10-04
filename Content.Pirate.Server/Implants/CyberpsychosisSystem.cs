@@ -54,6 +54,8 @@ public sealed class CyberpsychosisSystem : EntitySystem
         SubscribeLocalEvent<CyberpsychosisLoadComponent, ImplantRemovedEvent>(OnImplantRemoved);
         SubscribeLocalEvent<CyberpsychosisLoadComponent, OrganAddedEvent>(OnOrganLoadAdded);
         SubscribeLocalEvent<CyberpsychosisLoadComponent, OrganRemovedEvent>(OnOrganLoadRemoved);
+        SubscribeLocalEvent<CyberpsychosisLoadComponent, BodyPartAddedEvent>(OnBodyPartLoadAdded);
+        SubscribeLocalEvent<CyberpsychosisLoadComponent, BodyPartRemovedEvent>(OnBodyPartLoadRemoved);
         SubscribeLocalEvent<CyberpsychosisComponent, ComponentShutdown>(OnShutdown);
         SubscribeLocalEvent<CyberpsychosisComponent, MobStateChangedEvent>(OnMobStateChanged);
     }
@@ -123,6 +125,36 @@ public sealed class CyberpsychosisSystem : EntitySystem
             body, PopupType.Medium);
     }
 
+    private void OnBodyPartLoadAdded(Entity<CyberpsychosisLoadComponent> ent, ref BodyPartAddedEvent args)
+    {
+        if (args.Part.Comp.Body is not { Valid: true } body)
+            return;
+
+        if (!TryComp<CyberpsychosisComponent>(body, out var cyber))
+            return;
+
+        RecalculateSanity(body, cyber);
+
+        _popup.PopupEntity(
+            Loc.GetString("cyberpsychosis-implant-info", ("value", cyber.SanityValue)),
+            body, PopupType.Medium);
+    }
+
+    private void OnBodyPartLoadRemoved(Entity<CyberpsychosisLoadComponent> ent, ref BodyPartRemovedEvent args)
+    {
+        if (args.Part.Comp.Body is not { Valid: true } body)
+            return;
+
+        if (!TryComp<CyberpsychosisComponent>(body, out var cyber))
+            return;
+
+        RecalculateSanity(body, cyber);
+
+        _popup.PopupEntity(
+            Loc.GetString("cyberpsychosis-implant-info", ("value", cyber.SanityValue)),
+            body, PopupType.Medium);
+    }
+
     private void OnShutdown(EntityUid uid, CyberpsychosisComponent component, ComponentShutdown args)
     {
         _alerts.ClearAlert(uid, "CyberpsychosisSanity");
@@ -161,6 +193,21 @@ public sealed class CyberpsychosisSystem : EntitySystem
             foreach (var organ in organs)
             {
                 totalLoad += organ.Comp1.SanityCost;
+                count++;
+            }
+        }
+
+        // Body parts carry load too, and organ enumeration does not include them:
+        // hands and arms are parts rather than organs, so a pair of cybernetic hand
+        // replacements contributed nothing until this was added.
+        if (_body.TryGetRootPart(mob, out var rootPart))
+        {
+            foreach (var (partUid, _) in _body.GetBodyPartChildren(rootPart.Value.Owner))
+            {
+                if (!TryComp<CyberpsychosisLoadComponent>(partUid, out var load))
+                    continue;
+
+                totalLoad += load.SanityCost;
                 count++;
             }
         }
