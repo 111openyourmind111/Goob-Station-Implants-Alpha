@@ -16,6 +16,8 @@ using Content.Shared.Popups;
 using Content.Shared.Electrocution;
 using Content.Shared.Tag;
 using Content.Shared.Stunnable;
+using Content.Server.Power.Components;
+using Content.Server.Construction.Components;
 using Content.Shared.Verbs;
 using Robust.Shared.GameObjects;
 using Robust.Shared.Player;
@@ -135,6 +137,13 @@ public sealed class WonderlandSystem : EntitySystem
         if (HasComp<BodyComponent>(target))
             return;
 
+        // Only overload electronics/devices that actually have power circuitry.
+        if (!HasComp<ApcComponent>(target) &&
+            !HasComp<ComputerComponent>(target))
+        {
+            return;
+        }
+
         var verb = CreateVerb(ref args, "wonderland-verb-overload");
         verb.Act = () => Overload(owner, comp, target);
     }
@@ -194,7 +203,7 @@ public sealed class WonderlandSystem : EntitySystem
         // Wonderland carries no credentials of its own. It spends the owner's, so it
         // can only ever open what the owner could already open.
         // AI bypasses credentials completely.
-        _doors.SetState(door, DoorState.Open);
+        _doors.TryOpen(door, user: owner);
         Say(owner, "wonderland-door-open");
     }
 
