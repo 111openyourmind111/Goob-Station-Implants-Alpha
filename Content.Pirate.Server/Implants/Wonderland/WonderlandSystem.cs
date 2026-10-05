@@ -14,11 +14,13 @@ using Content.Shared.Explosion.EntitySystems;
 using Content.Shared.Interaction;
 using Content.Shared.Popups;
 using Content.Shared.Electrocution;
+using Content.Shared.Tag;
 using Content.Shared.Stunnable;
 using Content.Shared.Verbs;
 using Robust.Shared.GameObjects;
 using Robust.Shared.Player;
 using Robust.Shared.Timing;
+using Robust.Shared.Prototypes;
 using Content.Server.Electrocution;
 
 namespace Content.Pirate.Server.Implants.Wonderland;
@@ -35,6 +37,7 @@ public sealed class WonderlandSystem : EntitySystem
     [Dependency] private readonly SharedPopupSystem _popup = default!;
     [Dependency] private readonly AlertsSystem _alerts = default!;
     [Dependency] private readonly IChatManager _chat = default!;
+    [Dependency] private readonly TagSystem _tagSystem = default!;
     [Dependency] private readonly IGameTiming _timing = default!;
 
     public override void Initialize()
@@ -46,6 +49,7 @@ public sealed class WonderlandSystem : EntitySystem
         SubscribeLocalEvent<DoorComponent, GetVerbsEvent<InteractionVerb>>(OnDoorVerbs);
         SubscribeLocalEvent<DamageableComponent, GetVerbsEvent<InteractionVerb>>(OnDeviceVerbs);
         SubscribeLocalEvent<MobStateComponent, GetVerbsEvent<InteractionVerb>>(OnMobVerbs);
+        SubscribeLocalEvent<WonderlandComponent, MapInitEvent>(OnWonderlandMapInit);
     }
 
     public override void Update(float frameTime)
@@ -308,6 +312,11 @@ public sealed class WonderlandSystem : EntitySystem
             > 0.25f => 3,
             _ => 4
         };
+    }
+
+    private void OnWonderlandMapInit(Entity<WonderlandComponent> ent, ref MapInitEvent args)
+    {
+        _tagSystem.AddTag(ent, "BypassInteractionRangeChecks");
     }
 
     private void ShockTarget(EntityUid owner, WonderlandComponent comp, EntityUid target)
