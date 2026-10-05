@@ -5,6 +5,7 @@ using Content.Pirate.Shared.Implants.Cyberpsychosis;
 using Content.Pirate.Shared.Implants.Wonderland;
 using Content.Shared.Alert;
 using Content.Shared.Body.Components;
+using Content.Shared.Mobs.Components;
 using Content.Shared.Damage;
 using Content.Shared.Doors;
 using Content.Shared.Doors.Components;
@@ -12,9 +13,12 @@ using Content.Shared.Doors.Systems;
 using Content.Shared.Explosion.EntitySystems;
 using Content.Shared.Interaction;
 using Content.Shared.Popups;
+using Content.Shared.Electrocution;
 using Content.Shared.Verbs;
 using Robust.Shared.GameObjects;
 using Robust.Shared.Player;
+using Robust.Shared.Timing;
+using Content.Server.Electrocution;
 
 namespace Content.Pirate.Server.Implants.Wonderland;
 
@@ -39,6 +43,7 @@ public sealed class WonderlandSystem : EntitySystem
         // acting user carrying the implant and standing close enough to reach it.
         SubscribeLocalEvent<DoorComponent, GetVerbsEvent<InteractionVerb>>(OnDoorVerbs);
         SubscribeLocalEvent<DamageableComponent, GetVerbsEvent<InteractionVerb>>(OnDeviceVerbs);
+        SubscribeLocalEvent<MobStateComponent, GetVerbsEvent<InteractionVerb>>(OnMobVerbs);
     }
 
     public override void Update(float frameTime)
@@ -167,11 +172,12 @@ public sealed class WonderlandSystem : EntitySystem
     {
         // Unobstructed: Wonderland reaches through the owner's body, so a wall between
         // them is a wall between Wonderland and the target.
-        return _interaction.InRangeUnobstructed(
-            (owner, Transform(owner)),
-            (target, Transform(target)),
-            comp.MaxRange,
-            SharedInteractionSystem.InRangeUnobstructedMask);
+        var ownerT = Transform(owner);
+        var targetT = Transform(target);
+        if (ownerT.MapID != targetT.MapID)
+            return false;
+        var dist = (ownerT.WorldPosition - targetT.WorldPosition).Length();
+        return dist <= comp.MaxRange;
     }
 
     private void OpenDoor(EntityUid owner, WonderlandComponent comp, EntityUid door)
@@ -181,12 +187,7 @@ public sealed class WonderlandSystem : EntitySystem
 
         // Wonderland carries no credentials of its own. It spends the owner's, so it
         // can only ever open what the owner could already open.
-        if (!_doors.HasAccess(door, owner))
-        {
-            Say(owner, "wonderland-door-denied");
-            return;
-        }
-
+        // AI bypasses credentials completely.
         _doors.SetState(door, DoorState.Open);
         Say(owner, "wonderland-door-open");
     }
@@ -270,6 +271,21 @@ public sealed class WonderlandSystem : EntitySystem
         Say(owner, "wonderland-lost-control");
     }
 
+
+    private void OnMobVerbs(Entity<MobStateComponent> target, ref GetVerbsEvent<InteractionVerb> args)
+    {
+        if (!TryGetCaster(ref args, out var owner, out var comp))
+            return;
+
+        // Shock: 1 second, small cost
+        var shock = CreateVerb(ref args, "wonderland-verb-shock");
+        shock.Act = () => ShockTarget(owner, comp, target);
+
+        // Kill: +10 sanity on top of normal costs; 10 seconds
+        var kill = CreateVerb(ref args, "wonderland-verb-kill");
+        kill.Act = () => KillTarget(owner, comp, target);
+    }
+
     private void Say(EntityUid owner, string key, params (string, object)[] args)
     {
         var text = Loc.GetString(key, args);
@@ -291,4 +307,51 @@ public sealed class WonderlandSystem : EntitySystem
             _ => 4
         };
     }
+
+    private void ShockTarget(EntityUid owner, WonderlandComponent comp, EntityUid target)
+    {
+        if (!Spend(owner, comp, 5f))
+            return;
+
+        // Try to find a nearby powered device to "overclock" for the shock effect.
+        // If there isn't one in range, still give a very light jolt by forcing electrocution
+        // via the server system's attempt pathway is messy; instead, try to electrocute directly.
+        if (!TryComp<ElectrocutionComponent>(target, out _))
+        {
+            // No-op if we can't apply electrocuted state cleanly
+        }
+
+        // Use server electrocution API: TryDoElectrocution (server override)
+        var electro = Get<ElectrocutionSystem>();
+        electro.TryDoElectrocution(target, owner, 5, TimeSpan.FromSeconds(1f), true);
+        Say(owner, "wonderland-shock-done");
+    }
+
+    private void KillTarget(EntityUid owner, WonderlandComponent comp, EntityUid target)
+    {
+        if (!TryComp<CyberpsychosisComponent>(owner, out var cyber))
+            return;
+
+        if (cyber.SanityValue - 10f - comp.SanityCostPerUse <= 0f)
+        {
+            Say(owner, "wonderland-too-far-gone");
+            return;
+        }
+
+        if (!Spend(owner, comp, 30f))
+            return;
+
+        cyber.SanityValue = Math.Clamp(cyber.SanityValue - (int)10f, 0, cyber.BaseSanity);
+        _cyberpsychosis.RefreshAlert(owner, cyber);
+        if (cyber.SanityValue <= 0)
+        {
+            LoseControl(owner, comp, cyber);
+            return;
+        }
+
+        var electro2 = Get<ElectrocutionSystem>();
+        electro2.TryDoElectrocution(target, owner, 20, TimeSpan.FromSeconds(10f), true);
+        Say(owner, "wonderland-kill-start");
+    }
+
 }

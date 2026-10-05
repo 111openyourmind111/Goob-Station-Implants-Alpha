@@ -28,3 +28,7 @@ alerts-wonderland-control-desc = The AI is still listening. For now.
 
 uplink-wonderland-name = Wonderland v.12.5a Cyberdeck
 uplink-wonderland-desc = A subdermal cyberdeck running the AI "Wonderland", wired into your nervous system. Costs 40 sanity to install and 1.5 per command. Wonderland will open what you can open, overload what you can touch, drain what you can reach, and short out station AIs. It needs you to stay in control — if you stop holding on, neither of you is coming back. 70 TC.
+wonderland-verb-shock = Ask Wonderland to shock
+wonderland-verb-kill = Ask Wonderland to kill
+wonderland-shock-done = Wonderland: Overclocked a relay. A jolt went through them.
+wonderland-kill-start = Wonderland: Beginning override. Their nervous system is coming apart.

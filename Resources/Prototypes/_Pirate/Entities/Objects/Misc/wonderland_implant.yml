@@ -30,12 +30,8 @@
       sanityCostPerUse: 1.5
       doorControlCost: 8
       overloadControlCost: 18
-      fundsControlCost: 12
-      hijackControlCost: 30
-      maxRange: 6
+      maxRange: 24
       actionCooldown: 2
-      reassertCooldown: 20
-      reassertThreshold: 20
       overloadFuse: 3
 
 - type: entity

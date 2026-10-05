@@ -52,7 +52,7 @@ public sealed partial class WonderlandComponent : Component
     ///     owner's own body, not through the room.
     /// </summary>
     [DataField]
-    public float MaxRange = 6f;
+    public float MaxRange = 24f;
 
     [DataField]
     public float ActionCooldown = 2f;
