@@ -141,6 +141,9 @@ public sealed class WonderlandSystem : EntitySystem
         if (!HasComp<ApcComponent>(target) &&
             !HasComp<ComputerComponent>(target))
         {
+            // Allow APCs named/typed via Apc component in shared? Also check by prototype name is messy.
+            // Fallback: allow entities that have power-related visuals or are machines
+            // But to keep safe, whitelist common machine parents? Just proceed if unsure? No.
             return;
         }
 
