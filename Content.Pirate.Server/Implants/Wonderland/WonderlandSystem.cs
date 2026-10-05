@@ -14,6 +14,7 @@ using Content.Shared.Explosion.EntitySystems;
 using Content.Shared.Interaction;
 using Content.Shared.Popups;
 using Content.Shared.Electrocution;
+using Content.Shared.Stunnable;
 using Content.Shared.Verbs;
 using Robust.Shared.GameObjects;
 using Robust.Shared.Player;
@@ -34,6 +35,7 @@ public sealed class WonderlandSystem : EntitySystem
     [Dependency] private readonly SharedPopupSystem _popup = default!;
     [Dependency] private readonly AlertsSystem _alerts = default!;
     [Dependency] private readonly IChatManager _chat = default!;
+    [Dependency] private readonly IGameTiming _timing = default!;
 
     public override void Initialize()
     {
@@ -313,17 +315,8 @@ public sealed class WonderlandSystem : EntitySystem
         if (!Spend(owner, comp, 5f))
             return;
 
-        // Try to find a nearby powered device to "overclock" for the shock effect.
-        // If there isn't one in range, still give a very light jolt by forcing electrocution
-        // via the server system's attempt pathway is messy; instead, try to electrocute directly.
-        if (!TryComp<ElectrocutionComponent>(target, out _))
-        {
-            // No-op if we can't apply electrocuted state cleanly
-        }
-
-        // Use server electrocution API: TryDoElectrocution (server override)
-        var electro = Get<ElectrocutionSystem>();
-        electro.TryDoElectrocution(target, owner, 5, TimeSpan.FromSeconds(1f), true);
+        var stun = Get<SharedStunSystem>();
+        stun.TryKnockdown(target, TimeSpan.FromSeconds(1f), true);
         Say(owner, "wonderland-shock-done");
     }
 
@@ -349,9 +342,17 @@ public sealed class WonderlandSystem : EntitySystem
             return;
         }
 
-        var electro2 = Get<ElectrocutionSystem>();
-        electro2.TryDoElectrocution(target, owner, 20, TimeSpan.FromSeconds(10f), true);
         Say(owner, "wonderland-kill-start");
+
+        // Kill after 10 seconds (lethal override)
+        Timer.Spawn(TimeSpan.FromSeconds(10f), () =>
+        {
+            if (Deleted(target) || !Exists(target))
+                return;
+
+            var mobState = Get<Content.Shared.Mobs.Systems.MobStateSystem>();
+            mobState.ChangeMobState(target, Content.Shared.Mobs.MobState.Dead, origin: owner);
+        });
     }
 
 }
