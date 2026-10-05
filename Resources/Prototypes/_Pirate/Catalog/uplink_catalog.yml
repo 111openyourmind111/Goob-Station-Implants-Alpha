@@ -289,3 +289,14 @@
     Telecrystal: 15
   categories:
   - UplinkImplants
+
+- type: listing
+  id: UplinkWonderland
+  name: uplink-wonderland-name
+  description: uplink-wonderland-desc
+  icon: { sprite: _Pirate/Implants/Accelerator/accelerator.rsi, state: accelerator }
+  productEntity: WonderlandImplanter
+  cost:
+    Telecrystal: 70
+  categories:
+  - UplinkImplants

@@ -1,0 +1,48 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+# Wonderland v.12.5a — a subdermal cyberdeck carrying the AI "Wonderland".
+# Bought on the syndicate uplink, installed with the implanter below.
+#
+# Installing it costs 40 sanity outright (via CyberpsychosisLoad, which the
+# cyberpsychosis recalculation applies as a net change, so removing the implant
+# refunds the same 40). Each command costs a further 1.5 sanity.
+
+- type: entity
+  parent: BaseSubdermalImplant
+  id: WonderlandImplant
+  name: Wonderland v.12.5a cyberdeck
+  description: A subdermal cyberdeck running the AI "Wonderland". On installation it synchronises with your nervous system and starts talking. It can open what you can open, fry what you can touch, and empty what you can reach — but every command costs you, and it is always listening.
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Sprite
+    sprite: _Pirate/Implants/Accelerator/accelerator.rsi
+    state: accelerator
+  - type: Icon
+    sprite: _Pirate/Implants/Accelerator/accelerator.rsi
+    state: accelerator
+  - type: CyberpsychosisLoad
+    sanityCost: 40
+  - type: ComponentsImplant
+    added:
+    - type: Wonderland
+      maxControl: 100
+      controlRegen: 4
+      sanityCostPerUse: 1.5
+      doorControlCost: 8
+      overloadControlCost: 18
+      fundsControlCost: 12
+      hijackControlCost: 30
+      maxRange: 6
+      actionCooldown: 2
+      reassertCooldown: 20
+      reassertThreshold: 20
+      overloadFuse: 3
+
+- type: entity
+  parent: BaseImplantOnlyImplanter
+  id: WonderlandImplanter
+  name: Wonderland implanter
+  description: A disposable syringe loaded with the Wonderland v.12.5a cyberdeck. The injection is unpleasant and permanent.
+  components:
+  - type: Implanter
+    implant: WonderlandImplant

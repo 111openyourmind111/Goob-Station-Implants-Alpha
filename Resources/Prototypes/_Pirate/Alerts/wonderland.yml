@@ -1,0 +1,16 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+- type: alert
+  id: WonderlandControl
+  icons:
+  - sprite: _Pirate/Implants/Cyberpsychosis/sanity_bar.rsi
+    state: sanity_bar_full
+  - sprite: _Pirate/Implants/Cyberpsychosis/sanity_bar.rsi
+    state: sanity_bar_medium
+  - sprite: _Pirate/Implants/Cyberpsychosis/sanity_bar.rsi
+    state: sanity_bar_low
+  - sprite: _Pirate/Implants/Cyberpsychosis/sanity_bar.rsi
+    state: sanity_bar_empty
+  maxSeverity: 4
+  name: alerts-wonderland-control-name
+  description: alerts-wonderland-control-desc
