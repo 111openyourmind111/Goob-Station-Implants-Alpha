@@ -133,19 +133,9 @@ public sealed class WonderlandSystem : EntitySystem
         if (!TryGetCaster(ref args, out var owner, out var comp))
             return;
 
-        // Mobs are not devices. Damaging people is the owner's own problem.
+        // Only block living bodies. Anything else can be overloaded.
         if (HasComp<BodyComponent>(target))
             return;
-
-        // Only overload electronics/devices that actually have power circuitry.
-        if (!HasComp<ApcComponent>(target) &&
-            !HasComp<ComputerComponent>(target))
-        {
-            // Allow APCs named/typed via Apc component in shared? Also check by prototype name is messy.
-            // Fallback: allow entities that have power-related visuals or are machines
-            // But to keep safe, whitelist common machine parents? Just proceed if unsure? No.
-            return;
-        }
 
         var verb = CreateVerb(ref args, "wonderland-verb-overload");
         verb.Act = () => Overload(owner, comp, target);
@@ -214,6 +204,18 @@ public sealed class WonderlandSystem : EntitySystem
     {
         if (!Spend(owner, comp, comp.OverloadControlCost))
             return;
+
+        // Extra sanity cost for overload
+        if (TryComp<CyberpsychosisComponent>(owner, out var cyber))
+        {
+            cyber.SanityValue = Math.Clamp(cyber.SanityValue - (int) comp.OverloadSanityCost, 0, cyber.BaseSanity);
+            _cyberpsychosis.RefreshAlert(owner, cyber);
+            if (cyber.SanityValue <= 0)
+            {
+                LoseControl(owner, comp, cyber);
+                return;
+            }
+        }
 
         if (comp.PendingOverloads.ContainsKey(device))
             return;

@@ -47,6 +47,9 @@ public sealed partial class WonderlandComponent : Component
     [DataField]
     public float OverloadControlCost = 18f;
 
+    [DataField]
+    public float OverloadSanityCost = 4f;
+
     /// <summary>
     ///     How close the owner must be to a target. Wonderland reaches through the
     ///     owner's own body, not through the room.
