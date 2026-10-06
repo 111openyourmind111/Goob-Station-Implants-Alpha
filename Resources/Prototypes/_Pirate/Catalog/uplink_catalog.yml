@@ -294,7 +294,7 @@
   id: UplinkWonderland
   name: uplink-wonderland-name
   description: uplink-wonderland-desc
-  icon: { sprite: _Pirate/Implants/Accelerator/accelerator.rsi, state: accelerator }
+  icon: { sprite: _Pirate/Implants/Wonderland/wonderland.rsi, state: wonderland }
   productEntity: WonderlandImplanter
   cost:
     Telecrystal: 70

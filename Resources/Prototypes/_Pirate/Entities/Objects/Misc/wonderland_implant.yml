@@ -15,11 +15,11 @@
   categories: [ HideSpawnMenu ]
   components:
   - type: Sprite
-    sprite: _Pirate/Implants/Accelerator/accelerator.rsi
-    state: accelerator
+    sprite: _Pirate/Implants/Wonderland/wonderland.rsi
+    state: wonderland
   - type: Icon
-    sprite: _Pirate/Implants/Accelerator/accelerator.rsi
-    state: accelerator
+    sprite: _Pirate/Implants/Wonderland/wonderland.rsi
+    state: wonderland
   - type: CyberpsychosisLoad
     sanityCost: 40
   - type: ComponentsImplant
