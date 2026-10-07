@@ -11,6 +11,7 @@ using Robust.Shared.Log;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
 using Robust.Shared.Timing;
+using Robust.Shared.Player;
 
 namespace Content.Pirate.Client.Implants.Cyberpsychosis;
 
@@ -23,7 +24,7 @@ public sealed class CyberpsychosisAudioSystem : EntitySystem
     private const string Layer2Collection = "CyberpsychosisGlitchLayer2";
     private const string HorrorCollection = "CyberpsychosisHorrorLayer";
 
-    [Dependency] private readonly IAudioManager _audio = default!;
+    [Dependency] private readonly AudioSystem _audio = default!;
     [Dependency] private readonly IPlayerManager _playerManager = default!;
     [Dependency] private readonly IEntityManager _entities = default!;
     [Dependency] private readonly IPrototypeManager _prototypes = default!;
