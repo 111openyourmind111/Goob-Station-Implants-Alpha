@@ -101,7 +101,7 @@ private float CalculateIntensity(CyberpsychosisComponent comp)
                 _ => 0f
             };
 
-            // Double the intensity for more psychedelic/crashable effects
-            return MathHelper.Clamp(baseIntensity * 2f, 0f, 1f);
+            // Triple the intensity for more psychedelic/crashable effects
+            return MathHelper.Clamp(baseIntensity * 3f, 0f, 1f);
         }
 }
