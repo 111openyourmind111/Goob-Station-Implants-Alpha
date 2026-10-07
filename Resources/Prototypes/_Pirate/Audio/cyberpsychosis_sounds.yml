@@ -5,32 +5,32 @@
 
 - type: soundCollection
   id: CyberpsychosisGlitchLayer1
-  sounds:
-  - path: /Audio/Cyberpsychosis/dragon-studio-glitch-effect-1-397982.ogg
-  - path: /Audio/Cyberpsychosis/dragon-studio-glitch-sound-effect-450447.ogg
-  - path: /Audio/Cyberpsychosis/dragon-studio-glitch-sound-effect-free-511304.ogg
-  - path: /Audio/Cyberpsychosis/dragon-studio-glitchy-effect-504031.ogg
-  - path: /Audio/Cyberpsychosis/dragon-studio-glitchy-effect-511315.ogg
-  - path: /Audio/Cyberpsychosis/abirkhan006-glitch-and-distortion-sound-effects-547046.ogg
-  - path: /Audio/Cyberpsychosis/kave_msri-digital-glitch-sfx-438248.ogg
-  - path: /Audio/Cyberpsychosis/premswaroopkasukurthi-glitch-sound-effect-12796.ogg
+  files:
+  - /Audio/Cyberpsychosis/dragon-studio-glitch-effect-1-397982.ogg
+  - /Audio/Cyberpsychosis/dragon-studio-glitch-sound-effect-450447.ogg
+  - /Audio/Cyberpsychosis/dragon-studio-glitch-sound-effect-free-511304.ogg
+  - /Audio/Cyberpsychosis/dragon-studio-glitchy-effect-504031.ogg
+  - /Audio/Cyberpsychosis/dragon-studio-glitchy-effect-511315.ogg
+  - /Audio/Cyberpsychosis/abirkhan006-glitch-and-distortion-sound-effects-547046.ogg
+  - /Audio/Cyberpsychosis/kave_msri-digital-glitch-sfx-438248.ogg
+  - /Audio/Cyberpsychosis/premswaroopkasukurthi-glitch-sound-effect-12796.ogg
 
 - type: soundCollection
   id: CyberpsychosisGlitchLayer2
-  sounds:
-  - path: /Audio/Cyberpsychosis/dragon-studio-glitchy-female-vocals-504038.ogg
-  - path: /Audio/Cyberpsychosis/dragon-studio-glitchy-robotic-vocals-504032.ogg
-  - path: /Audio/Cyberpsychosis/virtual_vibes-glitch-effect-hd-1-400942.ogg
-  - path: /Audio/Cyberpsychosis/studiokolomna-glitch-sound-fx-pack-01-118233.ogg
-  - path: /Audio/Cyberpsychosis/studiokolomna-glitch-sound-fx-pack-10-118242.ogg
-  - path: /Audio/Cyberpsychosis/sound_garage-glitch-fx-transitions-6-311803.ogg
+  files:
+  - /Audio/Cyberpsychosis/dragon-studio-glitchy-female-vocals-504038.ogg
+  - /Audio/Cyberpsychosis/dragon-studio-glitchy-robotic-vocals-504032.ogg
+  - /Audio/Cyberpsychosis/virtual_vibes-glitch-effect-hd-1-400942.ogg
+  - /Audio/Cyberpsychosis/studiokolomna-glitch-sound-fx-pack-01-118233.ogg
+  - /Audio/Cyberpsychosis/studiokolomna-glitch-sound-fx-pack-10-118242.ogg
+  - /Audio/Cyberpsychosis/sound_garage-glitch-fx-transitions-6-311803.ogg
 
 - type: soundCollection
   id: CyberpsychosisHorrorLayer
-  sounds:
-  - path: /Audio/Cyberpsychosis/freesound_community-he-can-see-us-horror-sound-design-25330.ogg
-  - path: /Audio/Cyberpsychosis/freesound_community-horror-voice-flashbacks-14469.ogg
-  - path: /Audio/Cyberpsychosis/freesound_community-scream-90747.ogg
-  - path: /Audio/Cyberpsychosis/weird_butt_sounds111-glitch-scream-305035.ogg
-  - path: /Audio/Cyberpsychosis/yarzur_ofc-sfx18-glitch-338377.ogg
-  - path: /Audio/Cyberpsychosis/lenspulse-80s-crt-tv-static-noise-amp-glitch-sound-effect-597768.ogg
+  files:
+  - /Audio/Cyberpsychosis/freesound_community-he-can-see-us-horror-sound-design-25330.ogg
+  - /Audio/Cyberpsychosis/freesound_community-horror-voice-flashbacks-14469.ogg
+  - /Audio/Cyberpsychosis/freesound_community-scream-90747.ogg
+  - /Audio/Cyberpsychosis/weird_butt_sounds111-glitch-scream-305035.ogg
+  - /Audio/Cyberpsychosis/yarzur_ofc-sfx18-glitch-338377.ogg
+  - /Audio/Cyberpsychosis/lenspulse-80s-crt-tv-static-noise-amp-glitch-sound-effect-597768.ogg
