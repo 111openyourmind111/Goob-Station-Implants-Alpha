@@ -1,0 +1,36 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+# Cyberpsychosis glitchy ambient sounds that play based on sanity level
+# The lower the sanity, the more frequent/intense the sounds
+
+- type: soundCollection
+  id: CyberpsychosisGlitchLayer1
+  sounds:
+  - path: /Audio/Cyberpsychosis/dragon-studio-glitch-effect-1-397982.mp3
+  - path: /Audio/Cyberpsychosis/dragon-studio-glitch-sound-effect-450447.mp3
+  - path: /Audio/Cyberpsychosis/dragon-studio-glitch-sound-effect-free-511304.mp3
+  - path: /Audio/Cyberpsychosis/dragon-studio-glitchy-effect-504031.mp3
+  - path: /Audio/Cyberpsychosis/dragon-studio-glitchy-effect-511315.mp3
+  - path: /Audio/Cyberpsychosis/abirkhan006-glitch-and-distortion-sound-effects-547046.mp3
+  - path: /Audio/Cyberpsychosis/kave_msri-digital-glitch-sfx-438248.mp3
+  - path: /Audio/Cyberpsychosis/premswaroopkasukurthi-glitch-sound-effect-12796.mp3
+
+- type: soundCollection
+  id: CyberpsychosisGlitchLayer2
+  sounds:
+  - path: /Audio/Cyberpsychosis/dragon-studio-glitchy-female-vocals-504038.mp3
+  - path: /Audio/Cyberpsychosis/dragon-studio-glitchy-robotic-vocals-504032.mp3
+  - path: /Audio/Cyberpsychosis/virtual_vibes-glitch-effect-hd-1-400942.mp3
+  - path: /Audio/Cyberpsychosis/studiokolomna-glitch-sound-fx-pack-01-118233.mp3
+  - path: /Audio/Cyberpsychosis/studiokolomna-glitch-sound-fx-pack-10-118242.mp3
+  - path: /Audio/Cyberpsychosis/sound_garage-glitch-fx-transitions-6-311803.mp3
+
+- type: soundCollection
+  id: CyberpsychosisHorrorLayer
+  sounds:
+  - path: /Audio/Cyberpsychosis/freesound_community-he-can-see-us-horror-sound-design-25330.mp3
+  - path: /Audio/Cyberpsychosis/freesound_community-horror-voice-flashbacks-14469.mp3
+  - path: /Audio/Cyberpsychosis/freesound_community-scream-90747.mp3
+  - path: /Audio/Cyberpsychosis/weird_butt_sounds111-glitch-scream-305035.mp3
+  - path: /Audio/Cyberpsychosis/yarzur_ofc-sfx18-glitch-338377.mp3
+  - path: /Audio/Cyberpsychosis/lenspulse-80s-crt-tv-static-noise-amp-glitch-sound-effect-597768.mp3
