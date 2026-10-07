@@ -20,37 +20,56 @@ void fragment() {
         return;
     }
 
-    // Chromatic aberration
-    highp float aberration = hallucinationPower * 0.015;
-    highp float r = texture(SCREEN_TEXTURE, uv + vec2(aberration * sin(time * 12.0), 0.0)).r;
+    // Chromatic aberration - MUCH stronger
+    highp float aberration = hallucinationPower * 0.035;
+    highp float r = texture(SCREEN_TEXTURE, uv + vec2(aberration * sin(time * 18.0), 0.0)).r;
     highp float g = texture(SCREEN_TEXTURE, uv).g;
-    highp float b = texture(SCREEN_TEXTURE, uv - vec2(aberration * cos(time * 12.0), 0.0)).b;
+    highp float b = texture(SCREEN_TEXTURE, uv - vec2(aberration * cos(time * 18.0), 0.0)).b;
 
-    // Noise overlay
-    highp vec2 noiseUv = uv * 50.0 + time * 3.0;
-    highp float noise = hash(noiseUv).x * hallucinationPower * 0.08;
+    // Noise overlay - denser and stronger
+    highp vec2 noiseUv = uv * 80.0 + time * 5.0;
+    highp float noise = hash(noiseUv).x * hallucinationPower * 0.15;
 
-    // Geometric distortion waves
+    // Geometric distortion waves - stronger and more complex
     highp vec2 distort = vec2(
-        sin(uv.y * 10.0 + time * 2.0) * 0.008,
-        cos(uv.x * 8.0 + time * 1.5) * 0.006
+        sin(uv.y * 15.0 + time * 3.0) * 0.015,
+        cos(uv.x * 12.0 + time * 2.5) * 0.012
     ) * hallucinationPower;
 
-    highp vec2 distortUv = uv + distort;
+    // Secondary distortion layer
+    highp vec2 distort2 = vec2(
+        sin(uv.x * 8.0 + time * 1.7) * 0.01,
+        cos(uv.y * 10.0 + time * 2.2) * 0.008
+    ) * hallucinationPower * 0.7;
+
+    highp vec2 distortUv = uv + distort + distort2;
 
     highp vec3 distortedColor = vec3(
-        texture(SCREEN_TEXTURE, distortUv + vec2(aberration * sin(time * 12.0), 0.0)).r,
+        texture(SCREEN_TEXTURE, distortUv + vec2(aberration * sin(time * 18.0), 0.0)).r,
         texture(SCREEN_TEXTURE, distortUv).g,
-        texture(SCREEN_TEXTURE, distortUv - vec2(aberration * cos(time * 12.0), 0.0)).b
+        texture(SCREEN_TEXTURE, distortUv - vec2(aberration * cos(time * 18.0), 0.0)).b
     );
 
-    highp vec3 finalColor = mix(color.rgb, distortedColor, hallucinationPower * 0.6);
+    // Color shift pulses
+    highp float colorShift = sin(time * 1.5) * 0.5 + 0.5;
+    highp float hueShift = hallucinationPower * colorShift * 0.1;
+
+    highp vec3 finalColor = mix(color.rgb, distortedColor, hallucinationPower * 0.8);
     finalColor += vec3(noise);
 
+    // Subtle hue rotation
+    highp float h = atan(finalColor.b - finalColor.g, finalColor.r - finalColor.g);
+    h += hueShift;
+    finalColor.rgb = mix(finalColor.rgb, vec3(cos(h), sin(h), -cos(h)) * 0.5 + 0.5, hallucinationPower * 0.2);
+
     // Vignette that increases with hallucination
-    highp float vignette = 1.0 - length(Pos - 0.5) * 1.2;
-    vignette = pow(vignette, 2.0);
-    vignette = mix(1.0, vignette, hallucinationPower * 0.4);
+    highp float vignette = 1.0 - length(Pos - 0.5) * 1.4;
+    vignette = pow(vignette, 2.5);
+    vignette = mix(1.0, vignette, hallucinationPower * 0.5);
+
+    // Scanline flicker
+    highp float flicker = sin(uv.y * 400.0 + time * 40.0) * 0.03 * hallucinationPower;
+    finalColor += vec3(flicker);
 
     COLOR = vec4(finalColor * vignette, 1.0);
 }
