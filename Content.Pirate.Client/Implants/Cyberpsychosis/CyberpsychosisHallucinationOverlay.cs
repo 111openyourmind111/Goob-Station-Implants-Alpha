@@ -78,27 +78,30 @@ public sealed class CyberpsychosisHallucinationOverlay : Overlay
         handle.UseShader(null);
     }
 
-    private float CalculateIntensity(CyberpsychosisComponent comp)
-    {
-        var hallucination = CyberpsychosisThresholds.Hallucination;
-        var glitch = CyberpsychosisThresholds.Glitch;
-
-        // The band between the reality break and hallucination thresholds belongs to the
-        // reality break, so hallucination stays dark until sanity falls past it and then
-        // ramps to 0.7 by the time the glitch stage begins.
-        return comp.CurrentState switch
+private float CalculateIntensity(CyberpsychosisComponent comp)
         {
-            SanityState.Normal => 0f,
-            SanityState.LessNormal => 0f,
-            SanityState.CloseCyberpsychosis => MathHelper.Clamp(
-                (hallucination - comp.SanityValue) / (float) (hallucination - glitch) * 0.7f,
-                0f,
-                0.7f),
-            SanityState.Cyberpsychosis => MathHelper.Clamp(
-                0.7f + (glitch - comp.SanityValue) / (float) glitch * 0.3f,
-                0.7f,
-                1f),
-            _ => 0f
-        };
-    }
+            var hallucination = CyberpsychosisThresholds.Hallucination;
+            var glitch = CyberpsychosisThresholds.Glitch;
+
+            // The band between the reality break and hallucination thresholds belongs to the
+            // reality break, so hallucination stays dark until sanity falls past it and then
+            // ramps to 0.7 by the time the glitch stage begins.
+            var baseIntensity = comp.CurrentState switch
+            {
+                SanityState.Normal => 0f,
+                SanityState.LessNormal => 0f,
+                SanityState.CloseCyberpsychosis => MathHelper.Clamp(
+                    (hallucination - comp.SanityValue) / (float) (hallucination - glitch) * 0.7f,
+                    0f,
+                    0.7f),
+                SanityState.Cyberpsychosis => MathHelper.Clamp(
+                    0.7f + (glitch - comp.SanityValue) / (float) glitch * 0.3f,
+                    0.7f,
+                    1f),
+                _ => 0f
+            };
+
+            // Double the intensity for more psychedelic/crashable effects
+            return MathHelper.Clamp(baseIntensity * 2f, 0f, 1f);
+        }
 }

@@ -72,13 +72,16 @@ public sealed class CyberpsychosisGlitchOverlay : Overlay
         handle.UseShader(null);
     }
 
-    private float CalculateIntensity(CyberpsychosisComponent comp)
-    {
-        if (comp.CurrentState < SanityState.Cyberpsychosis)
-            return 0f;
+private float CalculateIntensity(CyberpsychosisComponent comp)
+        {
+            if (comp.CurrentState < SanityState.Cyberpsychosis)
+                return 0f;
 
-        var glitch = CyberpsychosisThresholds.Glitch;
+            var glitch = CyberpsychosisThresholds.Glitch;
 
-        return MathHelper.Clamp((glitch - comp.SanityValue) / (float) glitch, 0f, 1f);
-    }
+            var baseIntensity = MathHelper.Clamp((glitch - comp.SanityValue) / (float) glitch, 0f, 1f);
+
+            // Double the intensity for more psychedelic/crashable effects
+            return MathHelper.Clamp(baseIntensity * 2f, 0f, 1f);
+        }
 }

@@ -85,6 +85,9 @@ public sealed class CyberpsychosisRealityBreakOverlay : Overlay
         if (comp.SanityValue > threshold)
             return 0f;
 
-        return MathHelper.Clamp((threshold - comp.SanityValue) / (float) threshold, 0f, 1f);
+        var baseIntensity = MathHelper.Clamp((threshold - comp.SanityValue) / (float) threshold, 0f, 1f);
+
+        // Double the intensity for more psychedelic/crashable effects
+        return MathHelper.Clamp(baseIntensity * 2f, 0f, 1f);
     }
 }
