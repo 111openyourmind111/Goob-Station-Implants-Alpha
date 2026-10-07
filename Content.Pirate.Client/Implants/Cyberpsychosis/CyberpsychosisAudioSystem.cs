@@ -141,16 +141,16 @@ private void PlayRandomFromCollection(string collectionId, float volume)
                 return;
             }
 
-            var sounds = collection.Sounds;
+            var sounds = collection.PickFiles;
             if (sounds.Count == 0)
             {
                 Logger.Error($"[CyberpsychosisAudio] Sound collection empty: {collectionId}");
                 return;
             }
 
-            var sound = _random.Pick(sounds);
-            var audioParams = AudioParams.Default.WithVolume(volume);
-            var result = _audio.PlayPredicted(sound, Filter.Local(), audioParams);
-            Logger.Info($"[CyberpsychosisAudio] Played {collectionId} sound: {sound} (volume={volume}, result={result.HasValue})");
+            var soundPath = _random.Pick(sounds);
+            var soundSpec = new SoundPathSpecifier(soundPath, AudioParams.Default.WithVolume(volume));
+            var result = _audio.PlayPredicted(soundSpec, Filter.Local(), audioParams: AudioParams.Default.WithVolume(volume));
+            Logger.Info($"[CyberpsychosisAudio] Played {collectionId} sound: {soundPath} (volume={volume}, result={result.HasValue})");
         }
 }
