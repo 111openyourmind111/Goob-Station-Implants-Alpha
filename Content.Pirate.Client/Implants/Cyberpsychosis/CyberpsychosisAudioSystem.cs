@@ -55,6 +55,13 @@ public sealed class CyberpsychosisAudioSystem : EntitySystem
         {
             if (!_prototypes.HasIndex<SoundCollectionPrototype>(id))
                 Logger.Error($"[CyberpsychosisAudio] Missing sound collection: {id}");
+            else
+            {
+                var proto = _prototypes.Index<SoundCollectionPrototype>(id);
+                Logger.Info($"[CyberpsychosisAudio] Loaded collection {id}: {proto.PickFiles.Count} sounds");
+                foreach (var f in proto.PickFiles)
+                    Logger.Info($"[CyberpsychosisAudio]   - {f}");
+            }
         }
     }
 

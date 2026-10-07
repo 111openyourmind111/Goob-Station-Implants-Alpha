@@ -1,0 +1,70 @@
+# Cyberpsychosis glitchy/horror ambient sounds
+# All sounds converted to OGG Vorbis for SS14 compatibility
+
+abirkhan006-glitch-and-distortion-sound-effects-547046.ogg
+Source: https://freesound.org/people/abirkhan006/sounds/547046/
+License: CC-BY-3.0
+Author: abirkhan006
+
+dragon-studio-glitch-effect-1-397982.ogg
+dragon-studio-glitch-sound-effect-450447.ogg
+dragon-studio-glitch-sound-effect-free-511304.ogg
+dragon-studio-glitchy-effect-504031.ogg
+dragon-studio-glitchy-effect-511315.ogg
+dragon-studio-glitchy-female-vocals-504038.ogg
+dragon-studio-glitchy-robotic-vocals-504032.ogg
+Source: https://freesound.org/people/dragon-studio/
+License: CC-BY-3.0
+Author: Dragon Studio
+
+freesound_community-he-can-see-us-horror-sound-design-25330.ogg
+freesound_community-horror-voice-flashbacks-14469.ogg
+freesound_community-scream-90747.ogg
+Source: https://freesound.org/people/freesound_community/
+License: CC-BY-3.0
+Author: Freesound Community
+
+kave_msri-digital-glitch-sfx-438248.ogg
+Source: https://freesound.org/people/kave_msri/sounds/438248/
+License: CC-BY-3.0
+Author: kave_msri
+
+lenspulse-80s-crt-tv-static-noise-amp-glitch-sound-effect-597768.ogg
+Source: https://freesound.org/people/lenspulse/sounds/597768/
+License: CC-BY-3.0
+Author: lenspulse
+
+premswaroopkasukurthi-glitch-sound-effect-12796.ogg
+Source: https://freesound.org/people/premswaroopkasukurthi/sounds/12796/
+License: CC-BY-3.0
+Author: premswaroopkasukurthi
+
+sound_garage-glitch-fx-transitions-6-311803.ogg
+Source: https://freesound.org/people/sound_garage/sounds/311803/
+License: CC-BY-3.0
+Author: sound_garage
+
+studiokolomna-glitch-sound-fx-pack-01-118233.ogg
+studiokolomna-glitch-sound-fx-pack-10-118242.ogg
+Source: https://freesound.org/people/studiokolomna/
+License: CC-BY-3.0
+Author: studiokolomna
+
+virtual_vibes-glitch-effect-hd-1-400942.ogg
+Source: https://freesound.org/people/virtual_vibes/sounds/400942/
+License: CC-BY-3.0
+Author: virtual_vibes
+
+weird_butt_sounds111-glitch-scream-305035.ogg
+Source: https://freesound.org/people/weird_butt_sounds111/sounds/305035/
+License: CC-BY-3.0
+Author: weird_butt_sounds111
+
+yarzur_ofc-sfx18-glitch-338377.ogg
+Source: https://freesound.org/people/yarzur_ofc/sounds/338377/
+License: CC-BY-3.0
+Author: yarzur_ofc
+
+All sounds originally in MP3 format, converted to OGG Vorbis using ffmpeg for SS14 engine compatibility.
+Original sources from Freesound.org under CC-BY-3.0 license.
+Attribution maintained as per license requirements.
