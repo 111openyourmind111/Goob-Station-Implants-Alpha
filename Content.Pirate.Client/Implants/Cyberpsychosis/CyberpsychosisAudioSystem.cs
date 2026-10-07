@@ -43,9 +43,9 @@ public sealed class CyberpsychosisAudioSystem : EntitySystem
     private TimeSpan _lastHorrorPlay = TimeSpan.Zero;
 
     // Minimum intervals between plays (at max sanity for that layer)
-    private readonly TimeSpan _baseLayer1Interval = TimeSpan.FromSeconds(15);
-    private readonly TimeSpan _baseLayer2Interval = TimeSpan.FromSeconds(20);
-    private readonly TimeSpan _baseHorrorInterval = TimeSpan.FromSeconds(25);
+    private readonly TimeSpan _baseLayer1Interval = TimeSpan.FromSeconds(12);
+    private readonly TimeSpan _baseLayer2Interval = TimeSpan.FromSeconds(15);
+    private readonly TimeSpan _baseHorrorInterval = TimeSpan.FromSeconds(18);
 
     public override void Initialize()
     {
@@ -54,7 +54,7 @@ public sealed class CyberpsychosisAudioSystem : EntitySystem
         foreach (var id in new[] { Layer1Collection, Layer2Collection, HorrorCollection })
         {
             if (!_prototypes.HasIndex<SoundCollectionPrototype>(id))
-                Logger.Error($"Missing sound collection for cyberpsychosis: {id}");
+                Logger.Error($"[CyberpsychosisAudio] Missing sound collection: {id}");
         }
     }
 
@@ -72,35 +72,35 @@ public sealed class CyberpsychosisAudioSystem : EntitySystem
         var sanity = comp.SanityValue;
         var now = _timing.CurTime;
 
-        // Layer 1: Ambient glitch sounds (starts at Reality Break)
+        // Layer 1: Ambient glitch sounds (starts at Reality Break, sanity <= 60)
         if (sanity <= RealityBreakThreshold)
         {
-            var interval = CalculateInterval(_baseLayer1Interval, sanity, RealityBreakThreshold, 5f);
+            var interval = CalculateInterval(_baseLayer1Interval, sanity, RealityBreakThreshold, 6f);
             if (now - _lastLayer1Play >= interval)
             {
-                PlayRandomFromCollection(Layer1Collection, CalculateVolume(sanity, RealityBreakThreshold, 0.5f, 0.9f));
+                PlayRandomFromCollection(Layer1Collection, CalculateVolume(sanity, RealityBreakThreshold, 0.6f, 1.0f));
                 _lastLayer1Play = now;
             }
         }
 
-        // Layer 2: More intense glitch sounds (starts at Hallucination)
+        // Layer 2: More intense glitch sounds (starts at Hallucination, sanity <= 45)
         if (sanity <= HallucinationThreshold)
         {
-            var interval = CalculateInterval(_baseLayer2Interval, sanity, HallucinationThreshold, 4f);
+            var interval = CalculateInterval(_baseLayer2Interval, sanity, HallucinationThreshold, 5f);
             if (now - _lastLayer2Play >= interval)
             {
-                PlayRandomFromCollection(Layer2Collection, CalculateVolume(sanity, HallucinationThreshold, 0.6f, 1.0f));
+                PlayRandomFromCollection(Layer2Collection, CalculateVolume(sanity, HallucinationThreshold, 0.7f, 1.0f));
                 _lastLayer2Play = now;
             }
         }
 
-        // Horror layer: Scary/disturbing sounds (starts at Glitch threshold)
+        // Horror layer: Scary/disturbing sounds (starts at Glitch threshold, sanity <= 20)
         if (sanity <= GlitchThreshold)
         {
-            var interval = CalculateInterval(_baseHorrorInterval, sanity, GlitchThreshold, 3f);
+            var interval = CalculateInterval(_baseHorrorInterval, sanity, GlitchThreshold, 4f);
             if (now - _lastHorrorPlay >= interval)
             {
-                PlayRandomFromCollection(HorrorCollection, CalculateVolume(sanity, GlitchThreshold, 0.7f, 1.0f));
+                PlayRandomFromCollection(HorrorCollection, CalculateVolume(sanity, GlitchThreshold, 0.8f, 1.0f));
                 _lastHorrorPlay = now;
             }
         }
@@ -114,7 +114,6 @@ public sealed class CyberpsychosisAudioSystem : EntitySystem
         if (sanity >= threshold)
             return baseInterval;
 
-        // Linear interpolation: at threshold = baseInterval, at 0 = baseInterval / scaleFactor
         var progress = 1f - (float)sanity / threshold;
         var multiplier = 1f - (progress * (1f - 1f / scaleFactor));
         var seconds = baseInterval.TotalSeconds * multiplier;
@@ -133,24 +132,31 @@ public sealed class CyberpsychosisAudioSystem : EntitySystem
         return minVolume + (progress * (maxVolume - minVolume));
     }
 
-private void PlayRandomFromCollection(string collectionId, float volume)
+    private void PlayRandomFromCollection(string collectionId, float volume)
+    {
+        if (!_prototypes.TryIndex<SoundCollectionPrototype>(collectionId, out var collection))
         {
-            if (!_prototypes.TryIndex<SoundCollectionPrototype>(collectionId, out var collection))
-            {
-                Logger.Error($"[CyberpsychosisAudio] Missing sound collection: {collectionId}");
-                return;
-            }
-
-            var sounds = collection.PickFiles;
-            if (sounds.Count == 0)
-            {
-                Logger.Error($"[CyberpsychosisAudio] Sound collection empty: {collectionId}");
-                return;
-            }
-
-            var soundPath = _random.Pick(sounds);
-            var soundSpec = new SoundPathSpecifier(soundPath, AudioParams.Default.WithVolume(volume));
-            var result = _audio.PlayPredicted(soundSpec, Filter.Local(), audioParams: AudioParams.Default.WithVolume(volume));
-            Logger.Info($"[CyberpsychosisAudio] Played {collectionId} sound: {soundPath} (volume={volume}, result={result.HasValue})");
+            Logger.Error($"[CyberpsychosisAudio] Missing sound collection: {collectionId}");
+            return;
         }
+
+        var sounds = collection.PickFiles;
+        if (sounds.Count == 0)
+        {
+            Logger.Error($"[CyberpsychosisAudio] Sound collection empty: {collectionId}");
+            return;
+        }
+
+        var soundPath = _random.Pick(sounds);
+        var pathString = soundPath.ToString();
+
+        var audioParams = AudioParams.Default.WithVolume(volume);
+        var result = _audio.PlayGlobal(
+            pathString,
+            Filter.Local(),
+            false,
+            audioParams);
+
+        Logger.Info($"[CyberpsychosisAudio] Played {collectionId}: {pathString} (vol={volume}, result={result.HasValue})");
+    }
 }
