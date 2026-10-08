@@ -19,67 +19,111 @@ void fragment() {
         return;
     }
 
-    // Scanlines - denser and more aggressive
-    highp float scanline = sin(uv.y * 1000.0 + time * 80.0) * 0.04 * glitchPower;
+    // EXTREME Scanlines - very dense and aggressive
+    highp float scanline = sin(uv.y * 1500.0 + time * 120.0) * 0.06 * glitchPower;
     highp vec2 scanUv = uv + vec2(0.0, scanline);
 
-    // Multiple horizontal tearing / pixel sorting layers
+    // Multiple horizontal tearing layers - very frequent
     highp float tearOffset = 0.0;
     highp float tearOffset2 = 0.0;
-    if (rand(vec2(floor(uv.y * 50.0), time * 15.0)) < 0.035 * glitchPower) {
-        tearOffset = (rand(vec2(floor(uv.y * 50.0), time * 15.0 + 100.0)) - 0.5) * 0.15 * glitchPower;
-        tearOffset2 = (rand(vec2(floor(uv.y * 50.0), time * 15.0 + 200.0)) - 0.5) * 0.08 * glitchPower;
+    highp float tearOffset3 = 0.0;
+    if (rand(vec2(floor(uv.y * 80.0), time * 25.0)) < 0.06 * glitchPower) {
+        tearOffset = (rand(vec2(floor(uv.y * 80.0), time * 25.0 + 100.0)) - 0.5) * 0.25 * glitchPower;
+        tearOffset2 = (rand(vec2(floor(uv.y * 80.0), time * 25.0 + 200.0)) - 0.5) * 0.15 * glitchPower;
+        tearOffset3 = (rand(vec2(floor(uv.y * 80.0), time * 25.0 + 300.0)) - 0.5) * 0.08 * glitchPower;
     }
 
-    // RGB channel separation during glitches - stronger
-    highp float r = texture(SCREEN_TEXTURE, uv + vec2(tearOffset + 0.006 * glitchPower, 0.0)).r;
+    // RGB channel separation - massive
+    highp float r = texture(SCREEN_TEXTURE, uv + vec2(tearOffset + 0.01 * glitchPower, 0.0)).r;
     highp float g = texture(SCREEN_TEXTURE, uv + vec2(0.0, scanline)).g;
-    highp float b = texture(SCREEN_TEXTURE, uv - vec2(tearOffset2 + 0.006 * glitchPower, 0.0)).b;
+    highp float b = texture(SCREEN_TEXTURE, uv - vec2(tearOffset2 + 0.01 * glitchPower, 0.0)).b;
 
-    // Pixel sorting blocks - more frequent and larger
+    // Pixel sorting blocks - very frequent
     highp float blockGlitch = 0.0;
-    if (rand(vec2(floor(uv.x * 25.0), floor(uv.y * 25.0) + time * 3.0)) < 0.018 * glitchPower) {
+    if (rand(vec2(floor(uv.x * 30.0), floor(uv.y * 30.0) + time * 4.0)) < 0.03 * glitchPower) {
         blockGlitch = 1.0;
     }
 
-    // Second pixel sorting layer
+    // Second pixel sorting layer - vertical
     highp float blockGlitch2 = 0.0;
-    if (rand(vec2(floor(uv.x * 15.0), floor(uv.y * 15.0) + time * 5.0 + 500.0)) < 0.012 * glitchPower) {
+    if (rand(vec2(floor(uv.x * 18.0), floor(uv.y * 18.0) + time * 7.0 + 500.0)) < 0.02 * glitchPower) {
         blockGlitch2 = 1.0;
+    }
+
+    // Third pixel sorting - diagonal
+    highp float blockGlitch3 = 0.0;
+    if (rand(vec2(floor(uv.x * 25.0), floor(uv.y * 25.0) + time * 5.0 + 1000.0)) < 0.015 * glitchPower) {
+        blockGlitch3 = 1.0;
     }
 
     highp vec3 glitchColor = vec3(r, g, b);
     if (blockGlitch > 0.5) {
-        // Pixel sort effect - shift horizontally
-        highp float sortShift = sin(time * 40.0 + uv.y * 60.0) * 0.08 * glitchPower;
+        // Horizontal pixel sort
+        highp float sortShift = sin(time * 60.0 + uv.y * 80.0) * 0.12 * glitchPower;
         glitchColor = texture(SCREEN_TEXTURE, uv + vec2(sortShift, 0.0)).rgb;
     }
     if (blockGlitch2 > 0.5) {
         // Vertical pixel sort
-        highp float sortShift2 = cos(time * 30.0 + uv.x * 40.0) * 0.05 * glitchPower;
+        highp float sortShift2 = cos(time * 45.0 + uv.x * 60.0) * 0.08 * glitchPower;
         glitchColor = texture(SCREEN_TEXTURE, uv + vec2(0.0, sortShift2)).rgb;
     }
-
-    // Scanline darkening - stronger
-    highp float scanDark = 1.0 - sin(uv.y * 800.0) * 0.18 * glitchPower;
-
-    // Static noise - more intense
-    highp float staticNoise = (rand(uv * 150.0 + time * 30.0) - 0.5) * 0.18 * glitchPower;
-
-    // Color channel swap glitches
-    highp float channelSwap = rand(vec2(floor(time * 2.0), 0.0));
-    if (channelSwap < 0.02 * glitchPower) {
-        glitchColor = glitchColor.brg; // Rotate RGB
+    if (blockGlitch3 > 0.5) {
+        // Diagonal pixel sort
+        highp float sortShift3 = sin(time * 40.0 + uv.x * 50.0 + uv.y * 50.0) * 0.06 * glitchPower;
+        glitchColor = texture(SCREEN_TEXTURE, uv + vec2(sortShift3, sortShift3)).rgb;
     }
 
-    highp vec3 finalColor = mix(color.rgb, glitchColor, glitchPower * 0.85);
+    // Scanline darkening - extreme
+    highp float scanDark = 1.0 - sin(uv.y * 1000.0) * 0.25 * glitchPower;
+
+    // Static noise - intense
+    highp float staticNoise = (rand(uv * 200.0 + time * 40.0) - 0.5) * 0.25 * glitchPower;
+
+    // Color channel swap glitches - frequent
+    highp float channelSwap = rand(vec2(floor(time * 3.0), 0.0));
+    if (channelSwap < 0.04 * glitchPower) {
+        glitchColor = glitchColor.brg;
+    }
+    if (channelSwap < 0.02 * glitchPower) {
+        glitchColor = glitchColor.gbr;
+    }
+
+    // Inversion flashes
+    if (rand(vec2(floor(time * 5.0), 0.0)) < 0.015 * glitchPower) {
+        glitchColor = 1.0 - glitchColor;
+    }
+
+    highp vec3 finalColor = mix(color.rgb, glitchColor, glitchPower * 0.95);
     finalColor *= scanDark;
     finalColor += vec3(staticNoise);
 
-    // Random bright flashes
-    if (rand(vec2(floor(time * 5.0), 0.0)) < 0.01 * glitchPower) {
-        finalColor += vec3(0.3, 0.3, 0.3);
+    // Random bright flashes - white
+    if (rand(vec2(floor(time * 7.0), 0.0)) < 0.015 * glitchPower) {
+        finalColor += vec3(0.4, 0.4, 0.4);
     }
+    // Magenta flashes
+    if (rand(vec2(floor(time * 11.0), 0.0)) < 0.01 * glitchPower) {
+        finalColor += vec3(0.6, 0.0, 0.8);
+    }
+    // Cyan flashes
+    if (rand(vec2(floor(time * 13.0), 0.0)) < 0.008 * glitchPower) {
+        finalColor += vec3(0.0, 0.8, 1.0);
+    }
+    // Full white flash
+    if (rand(vec2(floor(time * 17.0), 0.0)) < 0.005 * glitchPower) {
+        finalColor = vec3(1.0, 1.0, 1.0);
+    }
+
+    // Scanline interference - dense
+    highp float interference = sin(Pos.y * 1200.0 + time * 80.0) * 0.08 * glitchPower;
+    finalColor += vec3(interference);
+
+    // Horizontal tear lines
+    highp float tear = sin(Pos.y * 25.0 + time * 40.0) * 0.06 * glitchPower;
+    finalColor += vec3(tear);
+
+    // Screen shake
+    highp float shake = (rand(vec2(floor(time * 100.0), 0.0)) - 0.5) * 0.04 * glitchPower;
 
     COLOR = vec4(finalColor, 1.0);
 }

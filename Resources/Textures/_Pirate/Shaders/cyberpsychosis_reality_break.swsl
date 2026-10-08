@@ -10,6 +10,10 @@ highp vec2 rotate(highp vec2 v, highp float a) {
     return mat2(c, -s, s, c) * v;
 }
 
+highp float rand(highp vec2 co) {
+    return fract(sin(dot(co.xy, vec2(12.9898, 78.233))) * 43758.5453);
+}
+
 void fragment() {
     highp vec2 uv = Pos;
     highp vec4 screenColor = texture(SCREEN_TEXTURE, Pos);
@@ -24,22 +28,26 @@ void fragment() {
     highp vec2 diff = uv - center;
     highp float dist = length(diff);
 
-    // Geometry warping - spiral distortion - STRONGER
-    highp float spiral = realityBreakPower * 0.9;
-    highp float spiralFactor = 1.0 + spiral * sin(dist * 25.0 - time * 4.0) * 0.18;
+    // EXTREME Geometry warping - spiral + wave distortion
+    highp float spiral = realityBreakPower * 1.5;
+    highp float spiralFactor = 1.0 + spiral * sin(dist * 30.0 - time * 5.0) * 0.25;
     uv = center + diff * spiralFactor;
 
     // Secondary wave distortion
-    highp float wave = sin(dist * 15.0 - time * 5.0) * 0.06 * realityBreakPower;
+    highp float wave = sin(dist * 20.0 - time * 7.0) * 0.1 * realityBreakPower;
     uv += diff * wave;
 
-    // Rotation that increases with time - faster
-    highp float rotation = realityBreakPower * sin(time * 0.8) * 0.5;
+    // Tertiary micro-distortion
+    highp float micro = sin(dist * 50.0 - time * 15.0) * 0.03 * realityBreakPower;
+    uv += diff * micro;
+
+    // Rotation - faster and more erratic
+    highp float rotation = realityBreakPower * sin(time * 1.2) * 0.8;
     uv = center + rotate(uv - center, rotation);
 
-    // Color inversion pulses - more aggressive
-    highp float invertPulse = sin(time * 3.0) * 0.5 + 0.5;
-    highp float invertAmount = realityBreakPower * invertPulse * 0.7;
+    // Color inversion pulses - aggressive
+    highp float invertPulse = sin(time * 4.0) * 0.5 + 0.5;
+    highp float invertAmount = realityBreakPower * invertPulse * 0.9;
 
     // Sample with distorted UV
     highp vec4 distortedColor = texture(SCREEN_TEXTURE, uv);
@@ -48,51 +56,80 @@ void fragment() {
     highp vec3 inverted = 1.0 - distortedColor.rgb;
     highp vec3 mixedColor = mix(distortedColor.rgb, inverted, invertAmount);
 
-    // Psychedelic color cycling
-    highp float colorCycle = sin(time * 0.7 + dist * 10.0) * 0.5 + 0.5;
-    mixedColor = mix(mixedColor, vec3(colorCycle, colorCycle * 0.7, colorCycle * 1.3) * 0.5, realityBreakPower * 0.3);
+    // Psychedelic color cycling - intense
+    highp float colorCycle = sin(time * 1.0 + dist * 15.0) * 0.5 + 0.5;
+    mixedColor = mix(mixedColor, vec3(colorCycle, colorCycle * 0.5, colorCycle * 1.5) * 0.7, realityBreakPower * 0.5);
 
-    // Vignette that closes in - much tighter
-    highp float vignette = 1.0 - length(Pos - 0.5) * 2.8;
-    vignette = pow(vignette, 4.0);
-    vignette = mix(1.0, vignette, realityBreakPower * 0.8);
+    // RGB shift pulses
+    highp float rgbShift = sin(time * 3.0) * 0.5 + 0.5;
+    mixedColor = mix(mixedColor, mixedColor.brg, realityBreakPower * rgbShift * 0.2);
+    mixedColor = mix(mixedColor, mixedColor.gbr, realityBreakPower * rgbShift * 0.15);
 
-    // Chromatic aberration - stronger
-    highp float aberration = realityBreakPower * 0.035;
+    // Vignette that closes in violently
+    highp float vignette = 1.0 - length(Pos - 0.5) * 3.5;
+    vignette = pow(vignette, 5.0);
+    vignette = mix(1.0, vignette, realityBreakPower * 0.9);
+    vignette *= 1.0 - sin(time * 2.0) * 0.2 * realityBreakPower;
+
+    // Chromatic aberration - massive
+    highp float aberration = realityBreakPower * 0.05;
     highp float r = texture(SCREEN_TEXTURE, uv + vec2(aberration, 0.0)).r;
     highp float g = distortedColor.g;
     highp float b = texture(SCREEN_TEXTURE, uv - vec2(aberration, 0.0)).b;
 
-    highp vec3 finalColor = mix(mixedColor, vec3(r, g, b), realityBreakPower * 0.5);
+    highp vec3 finalColor = mix(mixedColor, vec3(r, g, b), realityBreakPower * 0.6);
 
-    // Scanline interference - denser
-    highp float interference = sin(Pos.y * 1000.0 + time * 50.0) * 0.05 * realityBreakPower;
+    // Scanline interference - very dense
+    highp float interference = sin(Pos.y * 1500.0 + time * 100.0) * 0.08 * realityBreakPower;
     finalColor += vec3(interference);
 
-    // Digital noise - stronger
-    highp float noise = fract(sin(dot(Pos * 150.0, vec2(12.9898, 78.233)) + time * 15.0) * 43758.5453);
-    finalColor += (noise - 0.5) * 0.18 * realityBreakPower;
+    // Digital noise - strong
+    highp float noise = fract(sin(dot(Pos * 200.0, vec2(12.9898, 78.233)) + time * 25.0) * 43758.5453);
+    finalColor += (noise - 0.5) * 0.25 * realityBreakPower;
 
     // Horizontal tear lines
-    highp float tear = sin(Pos.y * 30.0 + time * 20.0) * 0.04 * realityBreakPower;
+    highp float tear = sin(Pos.y * 35.0 + time * 60.0) * 0.08 * realityBreakPower;
     finalColor += vec3(tear);
 
-    // Random color channel drops
-    if (fract(sin(time * 7.0) * 43758.5453) < 0.02 * realityBreakPower) {
+    // Random color channel drops - frequent
+    if (fract(sin(time * 9.0) * 43758.5453) < 0.03 * realityBreakPower) {
         finalColor = finalColor.gbr;
     }
-    if (fract(sin(time * 11.0) * 43758.5453) < 0.015 * realityBreakPower) {
+    if (fract(sin(time * 13.0) * 43758.5453) < 0.02 * realityBreakPower) {
         finalColor = finalColor.brg;
     }
+    if (fract(sin(time * 17.0) * 43758.5453) < 0.015 * realityBreakPower) {
+        finalColor = finalColor.bgr;
+    }
 
-    // Random bright flashes / screen flash
-    if (fract(sin(time * 13.0) * 43758.5453) < 0.008 * realityBreakPower) {
-        finalColor += vec3(0.4, 0.3, 0.5);
+    // Random bright flashes - white
+    if (fract(sin(time * 11.0) * 43758.5453) < 0.012 * realityBreakPower) {
+        finalColor += vec3(0.5, 0.4, 0.6);
+    }
+    // Magenta flash
+    if (fract(sin(time * 19.0) * 43758.5453) < 0.008 * realityBreakPower) {
+        finalColor += vec3(0.8, 0.0, 1.0);
+    }
+    // Cyan flash
+    if (fract(sin(time * 23.0) * 43758.5453) < 0.006 * realityBreakPower) {
+        finalColor += vec3(0.0, 1.0, 1.0);
+    }
+    // Full white flash
+    if (fract(sin(time * 29.0) * 43758.5453) < 0.004 * realityBreakPower) {
+        finalColor = vec3(1.0, 1.0, 1.0);
+    }
+    // Inversion flash
+    if (fract(sin(time * 31.0) * 43758.5453) < 0.003 * realityBreakPower) {
+        finalColor = 1.0 - finalColor;
     }
 
     // Screen shake simulation via UV jitter
-    highp float shake = (fract(sin(time * 60.0) * 43758.5453) - 0.5) * 0.02 * realityBreakPower;
+    highp float shake = (rand(vec2(floor(time * 120.0), 0.0)) - 0.5) * 0.04 * realityBreakPower;
     uv.x += shake;
+
+    // Micro jitter
+    highp float microShake = (rand(vec2(floor(time * 200.0), 0.0)) - 0.5) * 0.015 * realityBreakPower;
+    uv.y += microShake;
 
     COLOR = vec4(finalColor * vignette, 1.0);
 }
